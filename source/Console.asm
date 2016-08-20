@@ -1,60 +1,60 @@
 ;-----	Console -----
 :console
 ;set sp, 0x0000
-set push, a
-set push, b
+push, ax
+push, bx
 
-set a, 0
-set b, [screen_loc]
-hwi [dev_screen]
+; mov ax, 0
+; mov bx, [screen_loc]
+; hwi [dev_screen]
 
-set a, 1
-set b, sys_font ;Set font
-hwi [dev_screen]
+; mov a, 1
+; mov b, sys_font ;Set font
+; hwi [dev_screen]
 
-set a, 2
-set b, sys_colour ;Set colours
-hwi [dev_screen]
+; set a, 2
+; set b, sys_colour ;Set colours
+; hwi [dev_screen]
 
-set [colour_text], [colour_text_user]	;Change to user settings
-set [colour_border], [colour_border_user]
-jsr border_colour
+mov [colour_text], [colour_text_user]	;Change to user settings
+mov [colour_border], [colour_border_user]
+call border_colour
 
-set [char_x_start], 0x0001
-jsr console_clear_cmd
-jsr clear_screen	;Clear screen
+mov [char_x_start], 0x0001
+call console_clear_cmd
+call clear_screen	;Clear screen
 
-set [char_x], 0x0000
-set [char_y], 0x0000
-set a, intro_text
-jsr draw_string	;Draw intro text
+mov [char_x], 0x0000
+mov [char_y], 0x0000
+mov a, intro_text
+call draw_string	;Draw intro text
 
-set [char_x], 0x0000
-set [char_y], 0x0001
-jsr draw_cmd_line	;Draw >
+mov [char_x], 0x0000
+mov [char_y], 0x0001
+call draw_cmd_line	;Draw >
 
-set a, 3
-set b, 0xbeef	;interrupt message = 0xbeef
-hwi [dev_keyboard]	;Make keyboard send interupts
+; mov a, 3
+; mov b, 0xbeef	;interrupt message = 0xbeef
+; hwi [dev_keyboard]	;Make keyboard send interupts
 
-ias console_int_handler	;set interrupt handler
+; ias console_int_handler	;set interrupt handler
 
-set a, 0
-hwi [dev_keyboard]	;clear keyboard buffer
+; set a, 0
+; hwi [dev_keyboard]	;clear keyboard buffer
 
-set b, pop
-set a, pop
-set pc, console_loop_start
+pop bx
+pop ax
+jmp console_loop_start
 
 :console_loop_start
-set c, 0x0000
-set [key_char], 0x0000
-ias console_int_handler
-iaq 0x0000
+mov cx, 0x0000
+mov [key_char], 0x0000
+; ias console_int_handler
+; iaq 0x0000
 :console_loop
-ifn [key_char], 0x0000
-	set pc, console_inp
-set pc, console_loop
+cmp [key_char], 0x0000
+jne console_inp
+jmp console_loop
 
 :console_int_handler
 jsr key_inp
