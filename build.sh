@@ -16,8 +16,15 @@ if test "`whoami`" != "root" ; then
 	exit
 fi
 
+rm -rf bin
+mkdir bin
+
+if [ ! -d "disk_images" ]; then
+	mkdir disk_images
+fi
+
 rm -f $DISK_IMG
-echo ">>> Creating new MikeOS floppy image..."
+echo ">>> Creating new floppy image..."
 mkdosfs -C $DISK_IMG 1440 || exit
 
 
@@ -33,14 +40,14 @@ nasm -O0 -w+orphan-labels -f bin -o ../bin/kernel.bin kernel.asm || exit
 
 echo ">>> Assembling programs..."
 
-cd programs
+# cd programs
 
-for i in *.asm
-do
-	nasm -O0 -w+orphan-labels -f bin $i -o ../../bin/programs/$(basename $i .asm).bin || exit
-done
+# for i in *.asm
+# do
+	# nasm -O0 -w+orphan-labels -f bin $i -o ../../bin/programs/$(basename $i .asm).bin || exit
+# done
 
-cd ..
+# cd ..
 cd ..
 
 echo ">>> Adding bootloader to floppy image..."
@@ -54,12 +61,12 @@ rm -rf tmp-loop
 
 mcopy -i $DISK_IMG bin/kernel.bin ::kernel.bin
 
-cd bin/programs
-for i in *.bin
-do
-	mcopy -i ../../$DISK_IMG $i ::$i
-done
-cd ../..
+# cd bin/programs
+# for i in *.bin
+# do
+	# mcopy -i ../../$DISK_IMG $i ::$i
+# done
+# cd ../..
 
 sleep 0.2
 
