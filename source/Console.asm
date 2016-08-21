@@ -189,9 +189,9 @@ jmp [cmd_list_addr+i]
 
 :console_clear_cmd
 pusha
-mov i, con_cmd
-mov z, [con_cmd_len]
-mov y, 0
+mov ax, con_cmd
+mov bx, [con_cmd_len]
+mov cx, 0
 call fill_mem
 mov [con_cmd_pos], 0
 popa
@@ -200,17 +200,21 @@ ret
 ;-- End loop --
 
 :end_secret
-set [char_x], 0
-set [char_y], 0
-set a, secret
-set i, 0x0000
-set j, 0x0000
+mov [char_x], 0
+mov [char_y], 0
+mov ax, secret
+mov cx, 0x0000
+mov bx, 0x0000
 :end_secret_loop
-add i, 0x0001
-ife i, 0xFFFF
-	add j, 0x0001
-ife j, 0x0004
-	call draw_string
-ife j, 0x0004
-	jmp end
+add cx, 0x0001
+cmp cx, 0xFFFF
+je .ifjmp1
+add bx, 0x0001
+.ifjmp1
+cmp bx, 0x0004
+je .ifjmp2
+call draw_string
+.ifjmp2
+cmp bx, 0x0004
+je end
 jmp end_secret_loop
