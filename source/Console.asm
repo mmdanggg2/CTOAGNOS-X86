@@ -57,141 +57,145 @@ jne console_inp
 jmp console_loop
 
 :console_int_handler
-jsr key_inp
-set a, [key_char]
-and a, 0x0100
-ife a, 0x0100
-	set [key_char], 0
-rfi 1
+call key_inp
+mov ax, [key_char]
+and ax, 0x0100
+cmp ax, 0x0100
+jne .ifjmp1
+	mov [key_char], 0
+.ifjmp1
+; rfi 1 ;return from interrupt
 
 :console_new_cmd
-jsr char_next_line
-set [char_x], 0x0000
-jsr console_clear_cmd
-jsr draw_cmd_line
-set c, 0
-set pc, console_loop_start
+call char_next_line
+mov [char_x], 0x0000
+call console_clear_cmd
+call draw_cmd_line
+mov cx, 0
+jmp console_loop_start
 
 ;-- Input Handling --
 
 :console_inp
-iaq 0x0001
-set c, [key_char]
-ife c, 0x0010
-	set pc, console_bksp	;Backspace
-ife c, 0x0011
-	set pc, console_return	;Return
-ife c, 0x0012
-	set pc, console_insert	;Insert
-ife c, 0x0013
-	set pc, console_delete	;Delete
-set pc, console_char	;Other
+; iaq 0x0001 ;start queing interrupts
+mov cx, [key_char]
+cmp cx, 0x0010
+je console_bksp	;Backspace
+cmp cx, 0x0011
+je console_return	;Return
+cmp cx, 0x0012
+je console_insert	;Insert
+cmp cx, 0x0013
+je console_delete	;Delete
+jmp console_char	;Other
 
 :console_bksp
-ife [char_x], [char_x_start]	;if nothing to remove
-	set pc, console_loop_start	;return
-jsr draw_blank
+cmp [char_x], [char_x_start]	;if nothing to remove
+je console_loop_start	;return
+call draw_blank
 sub [char_x], 0x0001
-jsr draw_cur
-set push, i
-ifn [con_cmd_pos], 0x0000
-	sub [con_cmd_pos], 0x0001
-set i, [con_cmd_pos]
-set [con_cmd+i], 0x0000
-set i, pop
-set pc, console_loop_start
+call draw_cur
+push dx
+cmp [con_cmd_pos], 0x0000
+je .ifjmp1
+sub [con_cmd_pos], 0x0001
+.ifjmp1
+mov dx, [con_cmd_pos]
+mov [con_cmd+i], 0x0000
+pop dx
+jmp console_loop_start
 
 :console_return
-jsr draw_blank
-jsr char_next_line
-set pc, console_cmd_read
+call draw_blank
+call char_next_line
+jmp console_cmd_read
 
 :console_insert
-set push, a
-set a, con_cmd
-jsr draw_string
-jsr draw_cur
-set a, pop
-set pc, console_loop_start
+push, ax
+mov ax, con_cmd
+call draw_string
+call draw_cur
+pop ax
+jmp console_loop_start
 
 :console_delete
-set push, c
-set c, 0x4D
-jsr draw_char
-jsr draw_cur
-set c, pop
-set pc, console_loop_start
+push cx
+mov cx, 0x4D
+call draw_char
+call draw_cur
+pop cx
+jmp console_loop_start
 
 ;-- Character Handling --
 
 :console_char
-set push, [colour_cur]
-jsr draw_char
-jsr char_next
-ife [char_x], 0x001F
-	set [colour_cur], 0xC000
-jsr console_cmd_inp
-jsr draw_cur
-set [colour_cur], pop
-set c, 0
-set pc, console_loop_start
+push [colour_cur]
+call draw_char
+call char_next
+cmp [char_x], 0x001F
+je .ifjmp1
+	mov [colour_cur], 0xC000
+.ifjmp1
+call console_cmd_inp
+call draw_cur
+pop [colour_cur]
+mov cx, 0
+jmp console_loop_start
 
 :console_cmd_inp
-ife [con_cmd_pos], [con_cmd_len]
-	set pc, pop
-set push, i
-set i, [con_cmd_pos]
-set [con_cmd+i], c
+cmp [con_cmd_pos], [con_cmd_len]
+je .ifjmp1
+	ret
+.ifjmp1
+push dx
+mov dx, [con_cmd_pos]
+mov [con_cmd+i], cx
 add [con_cmd_pos], 0x0001
-set i, pop
-set pc, pop
+pop dx
+ret
 
 ;-- Command Reading --
 
 :console_cmd_read
-ife [con_cmd_pos], 0x0000
-	set pc, console_new_cmd
-set push, i
-set i, 0x0000
+cmp [con_cmd_pos], 0x0000
+je console_new_cmd
+push dx
+mov dx, 0x0000
 :console_cmd_read_loop
-ife [cmd_list+i], 0x0000
-	set pc, console_cmd_read_none
-set a, [cmd_list+i]
-set b, con_cmd
-jsr cmp_string
-ife z, 0x0001
-	set pc, console_cmd_read_match
-add i, 0x0001
-set pc, console_cmd_read_loop
+cmp [cmd_list+dx], 0x0000
+je console_cmd_read_none
+mov ax, [cmd_list+dx]
+mov bx, con_cmd
+call cmp_string
+cmp cx, 0x0001 ;CX = ret from cmp_string
+je console_cmd_read_match
+add dx, 0x0001
+jmp console_cmd_read_loop
 
 :console_cmd_read_none
-set i, pop
-set [char_x], 0x0000
-set a, not_cmd
-jsr draw_string
-set pc, console_new_cmd
+pop dx
+mov [char_x], 0x0000
+mov ax, not_cmd
+call draw_string
+jmp console_new_cmd
 
 :console_cmd_read_match
-jsr console_clear_cmd
-set c, 0x0000
-set 0, pop
-iaq 0
-ias 0
-set pc, [cmd_list_addr+i]
+call console_clear_cmd
+mov cx, 0x0000
+pop 0
+; iaq 0 ;enable interupts
+; ias 0 ;resets interrupt addr
+jmp [cmd_list_addr+i]
 
 :console_clear_cmd
-set push, i
-set push, z
-set push, y
-set i, con_cmd
-set z, [con_cmd_len]
-set y, 0
-jsr fill_mem
-set [con_cmd_pos], 0
-set y, pop
-set z, pop
-set i, pop
-set pc, pop
+pusha
+mov i, con_cmd
+mov z, [con_cmd_len]
+mov y, 0
+call fill_mem
+mov [con_cmd_pos], 0
+popa
+ret
 
 ;-- End loop --
 
@@ -206,7 +210,7 @@ add i, 0x0001
 ife i, 0xFFFF
 	add j, 0x0001
 ife j, 0x0004
-	jsr draw_string
+	call draw_string
 ife j, 0x0004
-	set pc, end
-set pc, end_secret_loop
+	jmp end
+jmp end_secret_loop
