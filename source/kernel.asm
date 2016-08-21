@@ -12,8 +12,11 @@ start:
 	mov ss, ax
 	mov sp, 4096
 	
-	;%include "Console.asm"
+	%include "Console.asm"
+	%include "Functions.asm"
+	%include "Data.asm"
 	
 	mov dword [es:0h], 07690748h
-
+	
+end:
 	jmp $			; Jump here - infinite loop!
