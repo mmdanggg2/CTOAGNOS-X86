@@ -14,7 +14,7 @@ char_offset: dw 0x0000
 char_x_start: dw 0x0001
 ;-	Typed Chars	-
 con_cmd:
-resw 0x001E 
+resw 0x1E
 dw 0x0000
 con_cmd_len: dw 0x001E
 con_cmd_pos: dw 0x0000
@@ -56,20 +56,20 @@ about4: dw "Created by ", 0x0000
 about4_2: dw "mmdanggg2", 0x0000
 
 ;-----	Commands	-----
-cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_test, cmd_shutdown, prog_painter, prog_calc, prog_logo, 0x0000
+cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_shutdown, 0x0000;cmd_test, prog_painter, prog_calc, prog_logo, 0x0000
 cmd_help: dw "help", 0x0000
 cmd_about: dw "about", 0x0000
 cmd_txtcolour: dw "txtcolour", 0x0000
 cmd_bordcolour: dw "bordercolour", 0x0000
 cmd_clear: dw "clear", 0x0000
 cmd_restart: dw "restart", 0x0000
-cmd_test: dw "test", 0x0000
 cmd_shutdown: dw "shutdown", 0x0000
+cmd_test: dw "test", 0x0000
 prog_painter: dw "painter", 0x0000
 prog_calc: dw "calc", 0x0000
 prog_logo: dw "logo", 0x0000
 
-cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, test, shutdown, program_painter, program_calculator, program_logo, 0x0000
+cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, shutdown, 0x0000;test, program_painter, program_calculator, program_logo, 0x0000
 
 null: dw 0x0000
 

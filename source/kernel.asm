@@ -14,6 +14,7 @@ start:
 	
 	%include "Console.asm"
 	%include "Functions.asm"
+	%include "OSCommands.asm"
 	%include "Data.asm"
 	
 	mov dword [es:0h], 07690748h

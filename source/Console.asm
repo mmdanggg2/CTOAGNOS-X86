@@ -22,17 +22,17 @@ console:
 	mov [colour_border], ax
 	call border_colour
 
-	mov [char_x_start], 0x0001
+	mov word [char_x_start], 0x0001
 	call console_clear_cmd
 	call clear_screen	;Clear screen
 
-	mov [char_x], 0x0000
-	mov [char_y], 0x0000
+	mov word [char_x], 0x0000
+	mov word [char_y], 0x0000
 	mov ax, intro_text
 	call draw_string	;Draw intro text
 
-	mov [char_x], 0x0000
-	mov [char_y], 0x0001
+	mov word [char_x], 0x0000
+	mov word [char_y], 0x0001
 	call draw_cmd_line	;Draw >
 
 	; mov a, 3
@@ -50,11 +50,11 @@ console:
 
 console_loop_start:
 	mov cx, 0x0000
-	mov [key_char], 0x0000
+	mov word [key_char], 0x0000
 	; ias console_int_handler
 	; iaq 0x0000
 console_loop:
-	cmp [key_char], 0x0000
+	cmp word [key_char], 0x0000
 	jne console_inp
 	jmp console_loop
 
@@ -64,13 +64,13 @@ console_int_handler:
 	and ax, 0x0100
 	cmp ax, 0x0100
 	jne .ifjmp1
-	mov [key_char], 0
+	mov word [key_char], 0
 .ifjmp1:
 	; rfi 1 ;return from interrupt
 
 console_new_cmd:
 	call char_next_line
-	mov [char_x], 0x0000
+	mov word [char_x], 0x0000
 	call console_clear_cmd
 	call draw_cmd_line
 	mov cx, 0
@@ -92,19 +92,20 @@ console_inp:
 	jmp console_char	;Other
 
 console_bksp:
-	cmp [char_x], [char_x_start]	;if nothing to remove
+	mov word si, [char_x]
+	cmp si, word [char_x_start]	;if nothing to remove
 	je console_loop_start	;return
 	call draw_blank
-	sub [char_x], 0x0001
+	sub word [char_x], 0x0001
 	call draw_cur
-	push dx
-	cmp [con_cmd_pos], 0x0000
+	push bx
+	cmp word [con_cmd_pos], 0x0000
 	je .ifjmp1
-	sub [con_cmd_pos], 0x0001
+	sub word [con_cmd_pos], 0x0001
 .ifjmp1:
-	mov dx, [con_cmd_pos]
-	mov [con_cmd+i], 0x0000
-	pop dx
+	mov bx, [con_cmd_pos]
+	mov word [con_cmd+bx], 0x0000
+	pop bx
 	jmp console_loop_start
 
 console_return:
@@ -131,52 +132,54 @@ console_delete:
 ;-- Character Handling --
 
 console_char:
-	push [colour_cur]
+	push word [colour_cur]
 	call draw_char
 	call char_next
-	cmp [char_x], 0x001F
+	cmp word [char_x], 0x001F
 	je .ifjmp1
-	mov [colour_cur], 0xC000
+	mov word [colour_cur], 0xC000
 .ifjmp1:
 	call console_cmd_inp
 	call draw_cur
-	pop [colour_cur]
+	pop word [colour_cur]
 	mov cx, 0
 	jmp console_loop_start
 
 console_cmd_inp:
-	cmp [con_cmd_pos], [con_cmd_len]
+	mov si, word [con_cmd_pos]
+	cmp si, word [con_cmd_len]
 	je .ifjmp1
 	ret
 .ifjmp1:
-	push dx
-	mov dx, [con_cmd_pos]
-	mov [con_cmd+i], cx
-	add [con_cmd_pos], 0x0001
-	pop dx
+	push bx
+	mov bx, [con_cmd_pos]
+	mov word [con_cmd+bx], cx
+	add word [con_cmd_pos], 0x0001
+	pop bx
 	ret
 
 ;-- Command Reading --
 
 console_cmd_read:
-	cmp [con_cmd_pos], 0x0000
+	cmp word [con_cmd_pos], 0x0000
 	je console_new_cmd
 	push dx
 	mov dx, 0x0000
+	mov si, dx
 console_cmd_read_loop:
-	cmp [cmd_list+dx], 0x0000
+	cmp word [cmd_list+si], 0x0000
 	je console_cmd_read_none
-	; mov ax, [cmd_list+dx] ; it doesn't like +dx
+	mov ax, [cmd_list+si]
 	mov bx, con_cmd
 	call cmp_string
-	cmp cx, 0x0001 ;CX = ret from cmp_string
+	cmp cx, 0x0001 ;CX = ret from cmp_string FIXME function returns
 	je console_cmd_read_match
-	add dx, 0x0001
+	add si, 0x0001
 	jmp console_cmd_read_loop
 
 console_cmd_read_none:
 	pop dx
-	mov [char_x], 0x0000
+	mov word [char_x], 0x0000
 	mov ax, not_cmd
 	call draw_string
 	jmp console_new_cmd
@@ -188,7 +191,7 @@ console_cmd_read_match:
 	mov cx, 0x0000
 	; iaq 0 ;enable interupts
 	; ias 0 ;resets interrupt addr
-	jmp [cmd_list_addr+i]
+	jmp [cmd_list_addr+si]
 
 console_clear_cmd:
 	pusha
@@ -196,15 +199,15 @@ console_clear_cmd:
 	mov bx, [con_cmd_len]
 	mov cx, 0
 	call fill_mem
-	mov [con_cmd_pos], 0
+	mov word [con_cmd_pos], 0
 	popa
 	ret
 
 ;-- End loop --
 
 end_secret:
-	mov [char_x], 0
-	mov [char_y], 0
+	mov word [char_x], 0
+	mov word [char_y], 0
 	mov ax, secret
 	mov cx, 0x0000
 	mov bx, 0x0000

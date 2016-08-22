@@ -31,15 +31,15 @@ key_char: dw 0x0000
 draw_char:
 	push cx
 	push bx
-	cmp [draw_type], 0x0000
+	cmp word [draw_type], 0x0000
 	je .ifjmp1
 	or cx, [colour_text]
 .ifjmp1:
-	and [char_x], 0x00ff	;prevent overflows
-	and [char_y], 0x000f
+	and word [char_x], 0x00ff	;prevent overflows
+	and word [char_y], 0x000f
 	call get_screen_offset
 	mov bx, [char_offset]
-	mov [bx], cx
+	mov word [bx], cx
 	pop bx
 	pop cx
 	ret
@@ -49,13 +49,17 @@ draw_char:
 ;-----	Get Screen Offset	-----
 ;-	outputs on char_offset
 get_screen_offset:
+	push ax
 	push cx
 	mov cx, [char_y]
-	mul cx, 0x0020
+	mov al, 0x20
+	mul cx
+	mov cx, ax
 	add cx, [char_x]
 	add cx, [screen_loc]
 	mov [char_offset], cx
 	pop cx
+	pop ax
 	ret
 
 
@@ -63,16 +67,19 @@ get_screen_offset:
 ;-----	Scroll Screen Up	-----
 scroll_up:
 	push ax
+	push bx
 	push cx
 	mov ax, 0x0000
-	mov cx, [screen_loc]
+	mov bx, [screen_loc]
 scroll_up_loop:
-	mov [cx], [cx+0x20]
+	mov cx, [bx+0x20]
+	mov [bx], cx
 	add ax, 0x0001
-	add cx, 0x0001
+	add bx, 0x0001
 	cmp ax, 0x0180
 	jne scroll_up_loop
 	pop cx
+	pop bx
 	pop ax
 	ret
 
@@ -81,12 +88,12 @@ scroll_up_loop:
 ;-----	Draw Cursor	-----
 draw_cur:
 	push cx
-	push [draw_type]
-	mov [draw_type], 0x0001
+	push word [draw_type]
+	mov word [draw_type], 0x0001
 	mov cx, [style_cur]
 	or cx, [colour_cur]
 	call draw_char
-	pop [draw_type]
+	pop word [draw_type]
 	pop cx
 	ret
 
@@ -117,27 +124,30 @@ draw_cmd_line:
 ;-	Move character to next pos/line
 ;-	If z/bx = AAAA, moves to nxt line w/ char_next
 char_next:
-	cmp [char_x], 0x001F
+	cmp word [char_x], 0x001F
 	je .ifjmp1
 	cmp bx, 0xAAAA
 	je .ifjmp1
 	jmp char_next_line
 .ifjmp1:
-	cmp [char_x], 0x001F
+	cmp word [char_x], 0x001F
 	jne .ifjmp2
-	add [char_x], 0x0001
+	add word [char_x], 0x0001
 .ifjmp2:
 	ret
 char_next_line:
-	mov [char_x], [char_x_start]
+	push ax
+	mov ax, [char_x_start]
+	mov [char_x], ax
+	pop ax
 	;ife z, 0xAAAA
 	;	set [char_x], 0x0000
-	add [char_y], 0x0001
-	cmp [char_y], 0x000C
+	add word [char_y], 0x0001
+	cmp word [char_y], 0x000C
 	je char_btm_screen
 	ret
 char_btm_screen:
-	mov [char_y], 0x000B
+	mov word [char_y], 0x000B
 	call scroll_up
 	ret
 
@@ -228,9 +238,11 @@ cmp_string:
 	push ax ;a/ax
 	push bx ;b/bx
 cmp_string_loop:
-	cmp [ax], [bx]
+	mov dx, [bx]
+	mov si, ax
+	cmp [si], dx
 		jne cmp_string_no
-	cmp [ax], 0x0000
+	cmp word [si], 0x0000
 		je cmp_string_yes
 	add ax, 0x0001
 	add bx, 0x0001
@@ -254,21 +266,22 @@ draw_logo:
 	push ax
 	push bx
 	push dx
-	push [colour_text]
-	mov [colour_text], [logo_colour]
+	push word [colour_text]
+	mov ax, [logo_colour]
+	mov [colour_text], ax
 	mov bx, [char_x]
 	mov ax, logo_str1
 	mov dx, 0x0000
 draw_logo_loop:
-	mov [char_x], bx
+	mov word [char_x], bx
 	call draw_string
 	add ax, 0x0009
 	add dx, 0x0001
-	add [char_y], 0x0001
+	add word [char_y], 0x0001
 	cmp dx, 0x0004
 	jne draw_logo_loop
 draw_logo_end:
-	pop [colour_text]
+	pop word [colour_text]
 	pop dx
 	pop bx
 	pop ax
@@ -299,32 +312,33 @@ colour_choices:
 	push cx ;i/cx
 	mov cx, 0x0000
 	mov si, cx
-	mov [colour_text], 0x0000
+	mov word [colour_text], 0x0000
 
 colour_choices_loop1:
-	cmp [colour_list+si], 0x0000
+	cmp word [colour_list+si], 0x0000
 	je colour_choices_loop1_end
 	
 	mov dx, [colour_list+si]
-	mov [char_x], 0x0000
+	mov word [char_x], 0x0000
 	call draw_string
 	add si, 0x0001
-	cmp [colour_list+si], 0x0000
+	cmp word [colour_list+si], 0x0000
 	je colour_choices_loop1_end
 	
 	mov dx, [colour_list+si]
-	add [colour_text], 0x1000
-	mov [char_x], 0x0012
+	add word [colour_text], 0x1000
+	mov word [char_x], 0x0012
 	call draw_string
 	add si, 0x0001
 	call char_next_line
-	add [colour_text], 0x1000
+	add word [colour_text], 0x1000
 	jmp colour_choices_loop1
 
 colour_choices_loop1_end:
-	mov [colour_text], [colour_text_user]
+	mov dx, [colour_text_user]
+	mov [colour_text], dx
 	call char_next_line
-	mov [char_x], 0x0000
+	mov word [char_x], 0x0000
 	mov dx, colour_input
 	call draw_string
 	call draw_cur
