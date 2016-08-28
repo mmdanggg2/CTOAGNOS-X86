@@ -27,19 +27,19 @@ key_char: dw 0x0000
 
 ;-----	Draw Character	-----
 ;-	char_x and char_y set pos
-;-	C is character
+;-	Cx is character
 draw_char:
 	push cx
 	push bx
 	cmp word [draw_type], 0x0000
-	je .ifjmp1
+	jne .ifjmp1
 	or cx, [colour_text]
 .ifjmp1:
 	and word [char_x], 0x00ff	;prevent overflows
 	and word [char_y], 0x000f
 	call get_screen_offset
 	mov bx, [char_offset]
-	mov word [bx], cx
+	mov word [es:bx], cx
 	pop bx
 	pop cx
 	ret
@@ -49,17 +49,16 @@ draw_char:
 ;-----	Get Screen Offset	-----
 ;-	outputs on char_offset
 get_screen_offset:
-	push ax
-	push cx
+	pusha
 	mov cx, [char_y]
-	mov al, 0x20
+	mov ax, 0x00A0
 	mul cx
 	mov cx, ax
 	add cx, [char_x]
-	add cx, [screen_loc]
+	add cx, [char_x]
+	;add cx, [es:0x0000]
 	mov [char_offset], cx
-	pop cx
-	pop ax
+	popa
 	ret
 
 
@@ -70,10 +69,10 @@ scroll_up:
 	push bx
 	push cx
 	mov ax, 0x0000
-	mov bx, [screen_loc]
+	mov bx, 0x0000;[es:0x0000]
 scroll_up_loop:
-	mov cx, [bx+0x20]
-	mov [bx], cx
+	mov cx, [es:bx+0x20]
+	mov [es:bx], cx
 	add ax, 0x0001
 	add bx, 0x0001
 	cmp ax, 0x0180
@@ -114,7 +113,7 @@ draw_cmd_line:
 	push ax
 	mov ax, new_cmd
 	call draw_string
-	call draw_cur
+	;call draw_cur
 	pop ax
 	ret
 
@@ -125,13 +124,13 @@ draw_cmd_line:
 ;-	If z/bx = AAAA, moves to nxt line w/ char_next
 char_next:
 	cmp word [char_x], 0x001F
-	je .ifjmp1
+	jne .ifjmp1
 	cmp bx, 0xAAAA
-	je .ifjmp1
+	jne .ifjmp1
 	jmp char_next_line
 .ifjmp1:
 	cmp word [char_x], 0x001F
-	jne .ifjmp2
+	je .ifjmp2
 	add word [char_x], 0x0001
 .ifjmp2:
 	ret
@@ -156,7 +155,7 @@ char_btm_screen:
 ;-----	Clear Screen	-----
 clear_screen:
 	pusha
-	mov bx, [screen_loc]
+	mov bx, 0x0000;[es:0x0000]
 	mov ax, 0x180
 	mov cx, 0
 	call fill_mem
@@ -208,25 +207,29 @@ copy_mem_end:
 
 
 ;-----	Draw String	-----
-;-	A/dx points to sring
+;-	A/ax points to sring
 draw_string:
-	push dx ;a/dx
-	push ax ;c/ax
-	push bx ;z/bx
-	mov si, dx
+	; push dx ;a/dx
+	; push ax ;c/ax
+	; push bx ;z/bx
+	pusha
+	mov si, ax
 	mov bx, 0xAAAA
 draw_string_loop:
-	mov ax, [si]
-	cmp ax, 0x0000
+	mov ax, 0x0000
+	mov al, [si]
+	cmp al, 0x00
 	je draw_string_end
+	mov cx, ax
 	call draw_char
 	call char_next
 	add si, 0x0001
 	jmp draw_string_loop
 draw_string_end:
-	pop bx
-	pop ax
-	pop dx
+	popa
+	; pop bx
+	; pop ax
+	; pop dx
 	ret
 
 

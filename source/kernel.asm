@@ -12,6 +12,8 @@ start:
 	mov ss, ax
 	mov sp, 4096
 	
+	jmp console
+	
 	%include "Console.asm"
 	%include "Functions.asm"
 	%include "OSCommands.asm"

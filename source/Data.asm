@@ -1,11 +1,11 @@
 ;-----	Variables	-----
-screen_loc: dw 0x8000
-colour_text: dw 0x7000
-colour_text_user: dw 0x7000
+;screen_loc: dw 0x8000 now specified by es, segment
+colour_text: dw 0x0700
+colour_text_user: dw 0x0700
 colour_border: dw 0x0000
 colour_border_user: dw 0x0000
 style_cur: dw 0x009F
-colour_cur: dw 0x7000
+colour_cur: dw 0x0700
 draw_type: dw 0x0000
 ;-	Screen Pos	-
 char_x: dw 0x0000
@@ -21,11 +21,11 @@ con_cmd_pos: dw 0x0000
 vec_mem: dw 0x9000
 
 ;-----	Strings	-----
-intro_text: dw "---== Welcome to CTOAGNOS! ==---", 0x0000
-new_cmd: dw ">", 0x0000
-not_cmd: dw "Unknown Command", 0x0000
-test_text: dw "Watch my vids on YouTube! =)", 0x0000
-secret: dw "What were you expecting, a pie?", 0x0000
+intro_text: db "---== Welcome to CTOAGNOS! ==---", 0x0000
+new_cmd: db ">", 0x0000
+not_cmd: db "Unknown Command", 0x0000
+test_text: db "Watch my vids on YouTube! =)", 0x0000
+secret: db "What were you expecting, a pie?", 0x0000
 
 colour_text_desc: dw "Choose the text colour.", 0x0000
 colour_border_desc: dw "Choose the border colour.", 0x0000

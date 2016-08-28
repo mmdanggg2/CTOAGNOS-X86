@@ -20,11 +20,11 @@ console:
 	mov [colour_text], ax
 	mov ax, [colour_border_user]
 	mov [colour_border], ax
-	call border_colour
+	;call border_colour
 
 	mov word [char_x_start], 0x0001
-	call console_clear_cmd
-	call clear_screen	;Clear screen
+	;call console_clear_cmd
+	;call clear_screen	;Clear screen
 
 	mov word [char_x], 0x0000
 	mov word [char_y], 0x0000
@@ -46,7 +46,7 @@ console:
 
 	pop bx
 	pop ax
-	jmp console_loop_start
+	jmp $;console_loop_start
 
 console_loop_start:
 	mov cx, 0x0000
