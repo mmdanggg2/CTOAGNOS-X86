@@ -23,8 +23,8 @@ console:
 	;call border_colour
 
 	mov word [char_x_start], 0x0001
-	;call console_clear_cmd
-	;call clear_screen	;Clear screen
+	call console_clear_cmd
+	call clear_screen	;Clear screen
 
 	mov word [char_x], 0x0000
 	mov word [char_y], 0x0000
@@ -46,7 +46,7 @@ console:
 
 	pop bx
 	pop ax
-	jmp $;console_loop_start
+	jmp console_loop_start
 
 console_loop_start:
 	mov cx, 0x0000
@@ -195,8 +195,8 @@ console_cmd_read_match:
 
 console_clear_cmd:
 	pusha
-	mov ax, con_cmd
-	mov bx, [con_cmd_len]
+	mov bx, con_cmd
+	mov ax, [con_cmd_len]
 	mov cx, 0
 	call fill_mem
 	mov word [con_cmd_pos], 0

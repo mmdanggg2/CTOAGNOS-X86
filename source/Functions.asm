@@ -155,10 +155,14 @@ char_btm_screen:
 ;-----	Clear Screen	-----
 clear_screen:
 	pusha
+	push ds
 	mov bx, 0x0000;[es:0x0000]
-	mov ax, 0x180
+	mov ax, 0x7D0; maybe 0xFA0
 	mov cx, 0
+	push es ;Roundabout way of doing mov ds, es
+	pop ds
 	call fill_mem
+	pop ds
 	popa
 	ret
 
