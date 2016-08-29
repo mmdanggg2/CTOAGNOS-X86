@@ -190,7 +190,7 @@ console_cmd_read_loop:
 	push word [cmd_list+si]; cmp_string arg1
 	call cmp_string
 	add sp, 4
-	cmp ax, 0x0001 ;ax = ret from cmp_string
+	cmp al, 0x01 ;al = ret from cmp_string
 	je console_cmd_read_match
 	add si, 0x0001
 	jmp console_cmd_read_loop
@@ -223,17 +223,16 @@ console_clear_cmd:
 end_secret:
 	mov word [char_x], 0
 	mov word [char_y], 0
-	mov ax, secret
 	mov cx, 0x0000
 	mov bx, 0x0000
 end_secret_loop:
 	add cx, 0x0001
 	cmp cx, 0xFFFF
-	je .ifjmp1
+	jne .ifjmp1
 	add bx, 0x0001
 .ifjmp1:
 	cmp bx, 0x0004
-	je .ifjmp2
+	jne .ifjmp2
 	push secret
 	call draw_string
 	add sp, 2

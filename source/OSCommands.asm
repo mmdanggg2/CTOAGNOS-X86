@@ -38,26 +38,30 @@ help:
 	pusha
 	push word [char_x_start]
 	mov word [char_x_start], 0x0000
-	;mov z, 0xAAAA ;FIXME command arguments
-	; mov i, 0x0000
-	; mov c, 0x002C
-	; cmp word [cmd_list+i], 0x0000
-	; je help_end
-	; mov a, [cmd_list+i]
+	mov si, 0x0000
+	cmp word [cmd_list+si], 0x0000
+	je .end
+	push word [cmd_list+si]; draw_string arg1
 	call draw_string
-	; add i, 0x0001
-help_loop:
-	; cmp word [cmd_list+i], 0x0000
-	je help_end
+	add sp, 2
+	add si, 0x0001
+.loop:
+	cmp word [cmd_list+si], 0x0000
+	je .end
+	push 0x002C; draw_char arg1
 	call draw_char
+	add sp, 2
+	push 1; char_next arg1
 	call char_next
 	call draw_blank
 	call char_next
-	; mov a, [cmd_list+i]
+	add sp, 2
+	push word [cmd_list+si]; draw_string arg1
 	call draw_string
-	; add i, 0x0001
-	jmp help_loop
-help_end:
+	add sp, 2
+	add si, 0x0001
+	jmp .loop
+.end:
 	pop word [char_x_start]
 	popa
 	jmp console_new_cmd
@@ -100,26 +104,25 @@ bordcolour_end:
 	jmp console_new_cmd
 
 about:
-	push ax
 	push word [char_x_start]
 	push word [colour_text]
 	mov word [char_x_start], 0x0000
 	call char_next_line
-	mov ax, about1
+	push about1
 	call draw_string
 	call char_next_line
-	mov ax, about2
+	push about2
 	call draw_string
 	call char_next_line
-	mov ax, about3
+	push about3
 	call draw_string
 	call char_next_line
-	mov ax, about4
+	push about4
 	call draw_string
-	mov word [colour_text], 0x1000
-	mov ax, about4_2
+	mov word [colour_text], 0x0100
+	push about4_2
 	call draw_string
+	add sp, 10
 	pop word [colour_text]
 	pop word [char_x_start]
-	pop ax
 	jmp console_new_cmd

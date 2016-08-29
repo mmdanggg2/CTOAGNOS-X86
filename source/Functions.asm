@@ -62,21 +62,19 @@ get_screen_offset:
 
 ;-----	Scroll Screen Up	-----
 scroll_up:
-	push ax
-	push bx
-	push cx
-	mov ax, 0x0000
-	mov bx, 0x0000;[es:0x0000]
-scroll_up_loop:
-	mov cx, [es:bx+0x20]
-	mov [es:bx], cx
-	add ax, 0x0001
-	add bx, 0x0001
-	cmp ax, 0x0180
-	jne scroll_up_loop
-	pop cx
-	pop bx
-	pop ax
+	pusha
+	push ds
+	push es ; mov ds, es
+	pop ds
+	mov si, 0x0000
+.loop:
+	mov dl, [si+0xA0]
+	mov [si], dl
+	add si, 0x0001
+	cmp si, 0x0FA0
+	jne .loop
+	pop ds
+	popa
 	ret
 
 
@@ -160,7 +158,7 @@ clear_screen:
 	push es ;Roundabout way of doing mov ds, es
 	pop ds
 	push 0x0000
-	push 0x7D0; maybe 0xFA0
+	push 0xFA0
 	push 0x0000;[es:0x0000]; fill_mem arg1
 	call fill_mem
 	add sp, 6
@@ -247,7 +245,7 @@ draw_string_end:
 
 ;-----	Compare String	-----
 ;-	arg1, arg2 = strings to cmp
-;-	ax = 1 if equal
+;-	al = 1 if equal
 cmp_string:
 	push bp
 	mov bp, sp
@@ -258,18 +256,18 @@ cmp_string:
 	mov dl, [di]
 	cmp [si], dl
 		jne .no
-	cmp word [si], 0x0000
+	cmp byte [si], 0x0000
 		je .yes
 	add si, 0x0001
 	add di, 0x0001
 	jmp .loop
 .yes:
 	popa
-	mov ax, 0x0001
+	mov al, 0x01
 	jmp .end
 .no:
 	popa
-	mov ax, 0x0000
+	mov al, 0x00
 	jmp .end
 .end:
 	pop bp
