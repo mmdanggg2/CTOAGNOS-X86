@@ -12,6 +12,15 @@ start:
 	mov ss, ax
 	mov sp, 4096
 	
+	mov ax, 0
+	mov bx, 0
+	mov dx, 0
+	mov ah, 02h
+	mov bh, 00h
+	mov dh, -1
+	mov dl, 0
+	int 10h; remove cursor
+	
 	jmp console
 	
 	%include "Console.asm"
