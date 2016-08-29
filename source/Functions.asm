@@ -108,11 +108,10 @@ draw_blank:
 
 ;-----	Draw Cmd Line	-----
 draw_cmd_line:
-	push ax
-	mov ax, new_cmd
+	push new_cmd
 	call draw_string
+	add sp, 2
 	call draw_cur
-	pop ax
 	ret
 
 
@@ -158,12 +157,13 @@ char_btm_screen:
 clear_screen:
 	pusha
 	push ds
-	mov bx, 0x0000;[es:0x0000]
-	mov ax, 0x7D0; maybe 0xFA0
-	mov cx, 0
 	push es ;Roundabout way of doing mov ds, es
 	pop ds
+	push 0x0000
+	push 0x7D0; maybe 0xFA0
+	push 0x0000;[es:0x0000]; fill_mem arg1
 	call fill_mem
+	add sp, 6
 	pop ds
 	popa
 	ret
@@ -171,21 +171,24 @@ clear_screen:
 
 
 ;-----	Fill Memory	-----
-;i/bx = address to fill
-;z/ax = ammount to fill
-;y/cx = filler
+;arg1 = address to fill
+;arg2 = ammount to fill
+;arg3 = filler
 fill_mem:
-	push bx
-	push dx ; j/dx
-	mov dx, 0
+	push bp
+	mov bp, sp
+	pusha
+	mov cx, 0
+	mov di, [bp + 4]; arg1
+	mov dx, [bp + 8]; arg3
 fill_mem_loop:
-	mov [bx], cx
-	add bx, 1
-	add dx, 1
-	cmp dx, ax
+	mov [di], dx; fill current addr
+	add di, 1
+	add cx, 1
+	cmp cx, [bp + 6]; arg2
 	jne fill_mem_loop
-	pop dx
-	pop bx
+	popa
+	pop bp
 	ret
 
 
@@ -213,61 +216,63 @@ copy_mem_end:
 
 
 ;-----	Draw String	-----
-;-	A/ax points to sring
+;-	arg1 = points to sring
 draw_string:
-	; push dx ;a/dx
-	; push ax ;c/ax
-	; push bx ;z/bx
+	push bp
+	mov bp, sp
 	pusha
-	mov si, ax
-	mov bx, 0xAAAA
-draw_string_loop:
+	mov si, [bp + 4]; arg1
 	mov ax, 0x0000
+draw_string_loop:
 	mov al, [si]
 	cmp al, 0x00
 	je draw_string_end
+	
 	push ax
 	call draw_char
 	add sp, 2
+	
 	push 0x0001
 	call char_next
 	add sp, 2
+	
 	add si, 0x0001
 	jmp draw_string_loop
 draw_string_end:
 	popa
-	; pop bx
-	; pop ax
-	; pop dx
+	pop bp
 	ret
 
 
 
 ;-----	Compare String	-----
-;-	A, B = strings to cmp
-;-	Z/dx = 1 if equal
+;-	arg1, arg2 = strings to cmp
+;-	ax = 1 if equal
 cmp_string:
-	push ax ;a/ax
-	push bx ;b/bx
-cmp_string_loop:
-	mov dx, [bx]
-	mov si, ax
-	cmp [si], dx
-		jne cmp_string_no
+	push bp
+	mov bp, sp
+	pusha
+	mov si, [bp + 4]; arg1
+	mov di, [bp + 6]; arg2
+.loop:
+	mov dl, [di]
+	cmp [si], dl
+		jne .no
 	cmp word [si], 0x0000
-		je cmp_string_yes
-	add ax, 0x0001
-	add bx, 0x0001
-	jmp cmp_string_loop
-cmp_string_yes:
-	pop bx
-	pop ax
-	mov dx, 0x0001
-	ret
-cmp_string_no:
-	pop bx
-	pop ax
-	mov dx, 0x0000
+		je .yes
+	add si, 0x0001
+	add di, 0x0001
+	jmp .loop
+.yes:
+	popa
+	mov ax, 0x0001
+	jmp .end
+.no:
+	popa
+	mov ax, 0x0000
+	jmp .end
+.end:
+	pop bp
 	ret
 
 

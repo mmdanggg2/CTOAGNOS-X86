@@ -28,8 +28,9 @@ console:
 
 	mov word [char_x], 0x0000
 	mov word [char_y], 0x0000
-	mov ax, intro_text
+	push intro_text
 	call draw_string	;Draw intro text
+	add sp, 2
 
 	mov word [char_x], 0x0000
 	mov word [char_y], 0x0001
@@ -122,11 +123,10 @@ console_return:
 	jmp console_cmd_read
 
 console_insert:
-	push ax
-	mov ax, con_cmd
+	push con_cmd; draw_string arg1
 	call draw_string
+	add sp, 2
 	call draw_cur
-	pop ax
 	jmp console_loop_start
 
 console_delete:
@@ -181,45 +181,41 @@ console_cmd_inp:
 console_cmd_read:
 	cmp word [con_cmd_pos], 0x0000
 	je console_new_cmd
-	push dx
-	mov dx, 0x0000
-	mov si, dx
+	push si
+	mov si, 0x0000
 console_cmd_read_loop:
-	cmp word [cmd_list+si], 0x0000
+	cmp byte [cmd_list+si], 0x00
 	je console_cmd_read_none
-	mov ax, [cmd_list+si]
-	mov bx, con_cmd
+	push con_cmd
+	push word [cmd_list+si]; cmp_string arg1
 	call cmp_string
-	cmp cx, 0x0001 ;CX = ret from cmp_string FIXME function returns
+	add sp, 4
+	cmp ax, 0x0001 ;ax = ret from cmp_string
 	je console_cmd_read_match
 	add si, 0x0001
 	jmp console_cmd_read_loop
 
 console_cmd_read_none:
-	pop dx
+	pop si
 	mov word [char_x], 0x0000
-	mov ax, not_cmd
+	push not_cmd
 	call draw_string
+	add sp, 2
 	jmp console_new_cmd
 
 console_cmd_read_match:
 	call console_clear_cmd
-	mov cx, 0x0000
-	pop cx ;was pop 0
-	mov cx, 0x0000
+	add sp, 2
 	sti
-	; iaq 0 ;enable interupts
-	; ias 0 ;resets interrupt addr
 	jmp [cmd_list_addr+si]
 
 console_clear_cmd:
-	pusha
-	mov bx, con_cmd
-	mov ax, [con_cmd_len]
-	mov cx, 0
+	push 0
+	push word [con_cmd_len]
+	push con_cmd; fill_mem arg1
 	call fill_mem
+	add sp, 6
 	mov word [con_cmd_pos], 0
-	popa
 	ret
 
 ;-- End loop --
@@ -238,7 +234,9 @@ end_secret_loop:
 .ifjmp1:
 	cmp bx, 0x0004
 	je .ifjmp2
+	push secret
 	call draw_string
+	add sp, 2
 .ifjmp2:
 	cmp bx, 0x0004
 	je end

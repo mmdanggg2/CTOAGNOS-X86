@@ -21,55 +21,55 @@ con_cmd_pos: dw 0x0000
 vec_mem: dw 0x9000
 
 ;-----	Strings	-----
-intro_text: db "---== Welcome to CTOAGNOS! ==---", 0x0000
-new_cmd: db ">", 0x0000
-not_cmd: db "Unknown Command", 0x0000
-test_text: db "Watch my vids on YouTube! =)", 0x0000
-secret: db "What were you expecting, a pie?", 0x0000
+intro_text: db "---== Welcome to CTOAGNOS! ==---", 0x00
+new_cmd: db ">", 0x00
+not_cmd: db "Unknown Command", 0x00
+test_text: db "Watch my vids on YouTube! =)", 0x00
+secret: db "What were you expecting, a pie?", 0x00
 
-colour_text_desc: dw "Choose the text colour.", 0x0000
-colour_border_desc: dw "Choose the border colour.", 0x0000
+colour_text_desc: db "Choose the text colour.", 0x00
+colour_border_desc: db "Choose the border colour.", 0x00
 colour_list: dw colour_0, colour_1, colour_2, colour_3, colour_4, colour_5, colour_6, colour_7, colour_8
-dw colour_9, colour_a, colour_b, colour_c, colour_d, colour_e, colour_f, 0x0000
-colour_0: dw "0.Black", 0x0000
-colour_1: dw "1.Dark Blue", 0x0000
-colour_2: dw "2.Dark Green", 0x0000
-colour_3: dw "3.Dark Cyan", 0x0000
-colour_4: dw "4.Dark Red", 0x0000
-colour_5: dw "5.Dark Pruple", 0x0000
-colour_6: dw "6.Brown", 0x0000
-colour_7: dw "7.Grey", 0x0000
-colour_8: dw "8.Dark Grey", 0x0000
-colour_9: dw "9.Blue", 0x0000
-colour_a: dw "a.Green", 0x0000
-colour_b: dw "b.Cyan", 0x0000
-colour_c: dw "c.Red", 0x0000
-colour_d: dw "d.Purple", 0x0000
-colour_e: dw "e.Yellow", 0x0000
-colour_f: dw "f.White", 0x0000
-colour_input: dw "Number or letter>", 0x0000
+dw colour_9, colour_a, colour_b, colour_c, colour_d, colour_e, colour_f, 0x00
+colour_0: db "0.Black", 0x00
+colour_1: db "1.Dark Blue", 0x00
+colour_2: db "2.Dark Green", 0x00
+colour_3: db "3.Dark Cyan", 0x00
+colour_4: db "4.Dark Red", 0x00
+colour_5: db "5.Dark Pruple", 0x00
+colour_6: db "6.Brown", 0x00
+colour_7: db "7.Grey", 0x00
+colour_8: db "8.Dark Grey", 0x00
+colour_9: db "9.Blue", 0x00
+colour_a: db "a.Green", 0x00
+colour_b: db "b.Cyan", 0x00
+colour_c: db "c.Red", 0x00
+colour_d: db "d.Purple", 0x00
+colour_e: db "e.Yellow", 0x00
+colour_f: db "f.White", 0x00
+colour_input: db "Number or letter>", 0x00
 
-about1: dw "CTOAGNOS Ver 3", 0x0000
-about2: dw "Couldn't Think Of A Good Name OS", 0x0000
-about3: dw "", 0x0000
-about4: dw "Created by ", 0x0000
-about4_2: dw "mmdanggg2", 0x0000
+about1: db "CTOAGNOS Ver 3", 0x00
+about2: db "Couldn't Think Of A Good Name OS", 0x00
+about3: db "", 0x00
+about4: db "Created by ", 0x00
+about4_2: db "mmdanggg2", 0x00
 
 ;-----	Commands	-----
-cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_shutdown, 0x0000;cmd_test, prog_painter, prog_calc, prog_logo, 0x0000
-cmd_help: dw "help", 0x0000
-cmd_about: dw "about", 0x0000
-cmd_txtcolour: dw "txtcolour", 0x0000
-cmd_bordcolour: dw "bordercolour", 0x0000
-cmd_clear: dw "clear", 0x0000
-cmd_restart: dw "restart", 0x0000
-cmd_shutdown: dw "shutdown", 0x0000
-cmd_test: dw "test", 0x0000
-prog_painter: dw "painter", 0x0000
-prog_calc: dw "calc", 0x0000
-prog_logo: dw "logo", 0x0000
+cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_shutdown, 0x00;cmd_test, prog_painter, prog_calc, prog_logo, 0x00
+cmd_help: db "help", 0x00
+cmd_about: db "about", 0x00
+cmd_txtcolour: db "txtcolour", 0x00
+cmd_bordcolour: db "bordercolour", 0x00
+cmd_clear: db "clear", 0x00
+cmd_restart: db "restart", 0x00
+cmd_shutdown: db "shutdown", 0x00
+cmd_test: db "test", 0x00
+prog_painter: db "painter", 0x00
+prog_calc: db "calc", 0x00
+prog_logo: db "logo", 0x00
 
-cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, shutdown, 0x0000;test, program_painter, program_calculator, program_logo, 0x0000
+cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, shutdown, 0x00;test, program_painter, program_calculator, program_logo, 0x00
 
 null: dw 0x0000
 
