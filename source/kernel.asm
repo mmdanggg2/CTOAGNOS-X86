@@ -27,6 +27,7 @@ start:
 	%include "Functions.asm"
 	%include "OSCommands.asm"
 	%include "Data.asm"
+	%include "programs/Test.asm"
 	
 	mov dword [es:0h], 07690748h
 	

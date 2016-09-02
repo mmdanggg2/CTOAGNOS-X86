@@ -44,7 +44,7 @@ help:
 	push word [cmd_list+si]; draw_string arg1
 	call draw_string
 	add sp, 2
-	add si, 0x0001
+	add si, 0x0002
 .loop:
 	cmp word [cmd_list+si], 0x0000
 	je .end
@@ -59,7 +59,7 @@ help:
 	push word [cmd_list+si]; draw_string arg1
 	call draw_string
 	add sp, 2
-	add si, 0x0001
+	add si, 0x0002
 	jmp .loop
 .end:
 	pop word [char_x_start]

@@ -56,7 +56,7 @@ about4: db "Created by ", 0x00
 about4_2: db "mmdanggg2", 0x00
 
 ;-----	Commands	-----
-cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_shutdown, 0x00;cmd_test, prog_painter, prog_calc, prog_logo, 0x00
+cmd_list: dw cmd_help, cmd_about, cmd_txtcolour, cmd_bordcolour, cmd_clear, cmd_restart, cmd_shutdown, cmd_test, 0x00;prog_painter, prog_calc, prog_logo, 0x00
 cmd_help: db "help", 0x00
 cmd_about: db "about", 0x00
 cmd_txtcolour: db "txtcolour", 0x00
@@ -69,7 +69,7 @@ prog_painter: db "painter", 0x00
 prog_calc: db "calc", 0x00
 prog_logo: db "logo", 0x00
 
-cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, shutdown, 0x00;test, program_painter, program_calculator, program_logo, 0x00
+cmd_list_addr: dw help, about, txtcolour, bordcolour, clear, restart, shutdown, test, 0x00;program_painter, program_calculator, program_logo, 0x00
 
 null: dw 0x0000
 
