@@ -36,16 +36,10 @@ console:
 	mov word [char_y], 0x0001
 	call draw_cmd_line	;Draw >
 	
-	KEYBOARD_INTERRUPT equ 9h
-	
-	push ds
-	push word 0
-	pop ds
-	cli
-	mov [4 * KEYBOARD_INTERRUPT], word console_int_handler
-	mov [4 * KEYBOARD_INTERRUPT + 2], cs
-	sti
-	pop ds
+	push keyboard_int_handler
+	call keyboard_int_setup
+	add sp, 2
+
 
 	; mov a, 3
 	; mov b, 0xbeef	;interrupt message = 0xbeef
@@ -70,12 +64,6 @@ console_loop:
 	cmp word [key_char], 0x0000
 	jne console_inp
 	jmp console_loop
-
-console_int_handler:
-	pusha
-	call key_inp
-	popa
-	iret ;return from interrupt
 
 console_new_cmd:
 	call char_next_line

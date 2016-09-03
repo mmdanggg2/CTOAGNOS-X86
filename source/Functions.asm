@@ -1,5 +1,5 @@
 ;-----	Keyboard Input	-----
-;-	Output on C
+;-	Output on key_char
 key_inp:
 	pusha
 	mov ax, 0x0000
@@ -8,7 +8,7 @@ key_inp:
 	jnz .end
 	mov bx, 0x0000
 	mov bl, al
-	mov al, [keymap + bx]
+	mov al, [keymap + bx]; calculate ascii from scancode
 	mov [key_char], ax
 .end:
 	mov al, 61h
@@ -17,6 +17,38 @@ key_inp:
 	ret
 
 key_char: dw 0x0000
+
+
+;----- Setup Keyboard Interrupt -----
+;-  arg1 is address of handler
+KEYBOARD_INTERRUPT equ 9h
+
+keyboard_int_setup:
+	push bp
+	mov bp, sp
+	push ax
+	push ds
+	mov ax, [bp+4]; arg1
+	push word 0; mov ds, 0
+	pop ds
+	cli
+	mov [4 * KEYBOARD_INTERRUPT], ax
+	mov [4 * KEYBOARD_INTERRUPT + 2], cs
+	sti
+	pop ds
+	pop ax
+	pop bp
+	ret
+
+
+
+;----- Keyboard Interrupt Handler -----
+;-  Called from keyboard int vector
+keyboard_int_handler:
+	pusha
+	call key_inp
+	popa
+	iret ;return from interrupt
 
 
 
@@ -323,79 +355,88 @@ border_colour:
 ;-	returns user choice on C/dx
 ;-	returns 0xffff if none chosen
 colour_choices:
-	push dx ;a/dx
-	push cx ;i/cx
-	mov cx, 0x0000
-	mov si, cx
+	push si
+	mov si, 0x0000
 	mov word [colour_text], 0x0000
 
-colour_choices_loop1:
+.loop1:
 	cmp word [colour_list+si], 0x0000
-	je colour_choices_loop1_end
+	je .loop1_end
 	
-	mov dx, [colour_list+si]
 	mov word [char_x], 0x0000
+	push word [colour_list+si]; draw_string arg1
 	call draw_string
-	add si, 0x0001
+	add sp, 2
+	add si, 0x0002
 	cmp word [colour_list+si], 0x0000
-	je colour_choices_loop1_end
+	je .loop1_end
 	
-	mov dx, [colour_list+si]
-	add word [colour_text], 0x1000
+	add word [colour_text], 0x0100
 	mov word [char_x], 0x0012
+	push word [colour_list+si]; draw_string arg1
 	call draw_string
-	add si, 0x0001
+	add sp, 2
+	add si, 0x0002
 	call char_next_line
-	add word [colour_text], 0x1000
-	jmp colour_choices_loop1
+	add word [colour_text], 0x0100
+	jmp .loop1
 
-colour_choices_loop1_end:
-	mov dx, [colour_text_user]
-	mov [colour_text], dx
+.loop1_end:
+	mov ax, [colour_text_user]
+	mov [colour_text], ax
 	call char_next_line
 	mov word [char_x], 0x0000
-	mov dx, colour_input
+	push colour_input
 	call draw_string
+	add sp, 2
 	call draw_cur
+	
+.get_input:
+	mov word [key_char], 0x0000
+.get_input_loop:
+	cmp word [key_char], 0x0000
+	jne .test_input
+	jmp .get_input_loop
 
-colour_choices_loop2:
-	call key_inp
-	cmp dx, 0x003A
-	jl .ifjmp1
-	cmp dx, 0x002F
-	jg colour_choices_num_inp
+.test_input:
+	mov ax, [key_char]
+	cmp ax, 0x003A
+	jge .ifjmp1
+	cmp ax, 0x002F
+	jg .num_inp
 .ifjmp1:
-	cmp dx, 0x0067
-	jl .ifjmp2
-	cmp dx, 0x0060
-	jg colour_choices_hex_inp
+	cmp ax, 0x0067
+	jge .ifjmp2
+	cmp ax, 0x0060
+	jg .hex_inp
 .ifjmp2:
-	cmp dx, 0x0011
-	je colour_choices_no_inp
-	jmp colour_choices_loop2
+	cmp ax, 0x0011
+	je .no_inp
+	jmp .get_input
 
-colour_choices_hex_inp:
+.hex_inp:
+	push ax
 	call draw_char
-	sub dx, 0x0060
-	add dx, 0x0009
-	pop cx
-	pop dx
-	ret
+	add sp, 2
+	sub ax, 0x0060
+	add ax, 0x0009
+	jmp .end
 
-colour_choices_num_inp:
+.num_inp:
+	push ax
 	call draw_char
-	sub dx, 0x0030
-	pop cx
-	pop dx
-	ret
+	add sp, 2
+	sub ax, 0x0030
+	jmp .end
 
-colour_choices_no_inp:
+.no_inp:
 	call draw_blank
-	mov dx, 0xffff
-	pop cx
-	pop dx
-	ret
+	mov ax, 0xffff
+	jmp .end
 
+.end:
+	pop si
+	ret
 
 
 ;-----	Floppy State	-----

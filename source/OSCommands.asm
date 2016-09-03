@@ -71,16 +71,18 @@ txtcolour:
 	pusha
 	push word [char_x_start]
 	mov word [char_x_start], 0x0000
-	mov ax, colour_text_desc ;FIXME arguments
+	push colour_text_desc; draw_string arg1
 	call draw_string
+	add sp, 2
 	call char_next_line
 	call colour_choices
-	; cmp c, 0xffff
-	; je txtcolour_end
-	; mul c, 0x1000
-	; mov word [colour_text_user], c
-	; mov word [colour_text], c
-txtcolour_end:
+	cmp ax, 0xffff
+	je .end
+	mov cx, 0x0100
+	mul cx
+	mov word [colour_text_user], ax
+	mov word [colour_text], ax
+.end:
 	pop word [char_x_start]
 	popa
 	jmp console_new_cmd
@@ -89,15 +91,16 @@ bordcolour:
 	pusha
 	push word [char_x_start]
 	mov word [char_x_start], 0x0000
-	; mov a, colour_border_desc
+	push colour_border_desc; draw_string arg1
 	call draw_string
+	add sp, 2
 	call char_next_line
 	call colour_choices
-	; cmp c, 0xffff
-	je bordcolour_end
-	; mov word [colour_border_user], c
-	; mov word [colour_border], c
-bordcolour_end:
+	cmp ax, 0xffff
+	je .end
+	mov word [colour_border_user], ax
+	mov word [colour_border], ax
+.end:
 	call border_colour
 	pop word [char_x_start]
 	popa
