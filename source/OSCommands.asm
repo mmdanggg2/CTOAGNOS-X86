@@ -27,8 +27,8 @@ shutdown:
 	call clear_screen
 	mov word [colour_border], 0x0000
 	call border_colour
-	mov word [char_x], 0x000C
-	mov word [char_y], 0x0004
+	mov word [char_x], (SCREEN_WIDTH/2)-(0xB/2)
+	mov word [char_y], (SCREEN_HEIGHT/2)-(4/2)
 	call draw_logo
 	jmp end_secret
 

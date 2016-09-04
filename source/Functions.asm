@@ -190,7 +190,7 @@ clear_screen:
 	push es ;Roundabout way of doing mov ds, es
 	pop ds
 	push 0x0000
-	push 0xFA0
+	push SCREEN_TOTAL_BYTES
 	push 0x0000;[es:0x0000]; fill_mem arg1
 	call fill_mem
 	add sp, 6

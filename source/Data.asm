@@ -1,6 +1,7 @@
 ;----- NASM defines -----
 SCREEN_WIDTH equ 80
 SCREEN_HEIGHT equ 25
+SCREEN_TOTAL_BYTES equ 0xFA0
 
 ;-----	Variables	-----
 ;screen_loc: dw 0x8000 now specified by es, segment
