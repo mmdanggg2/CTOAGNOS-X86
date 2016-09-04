@@ -2,16 +2,17 @@
 console:
 	push ax
 	push bx
-
-	; mov a, 1
-	; mov b, sys_font ;Set font
-	; hwi [dev_screen]
+	
 	call setup_font
-
-	; set a, 2
+	
 	; set b, sys_colour ;Set colours
-	; hwi [dev_screen]
-
+	mov ax, 0x1010
+	mov bx, 0x39
+	mov ch, 0x27
+	mov cl, 0x3F
+	mov dh, 0x00
+	int 10h
+	
 	mov ax, [colour_text_user]	;Change to user settings
 	mov [colour_text], ax
 	mov ax, [colour_border_user]
