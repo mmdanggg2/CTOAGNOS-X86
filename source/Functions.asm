@@ -64,8 +64,8 @@ draw_char:
 	jne .ifjmp1
 	or cx, [colour_text]
 .ifjmp1:
-	and word [char_x], 0x00ff	;prevent overflows
-	and word [char_y], 0x000f
+	; and word [char_x], 0x00ff	;prevent overflows
+	; and word [char_y], 0x000f
 	call get_screen_offset
 	mov bx, [char_offset]
 	mov word [es:bx], cx
@@ -80,7 +80,7 @@ draw_char:
 get_screen_offset:
 	pusha
 	mov cx, [char_y]
-	mov ax, 0x00A0
+	mov ax, SCREEN_WIDTH * 2
 	mul cx
 	mov cx, ax
 	add cx, [char_x]
@@ -100,10 +100,10 @@ scroll_up:
 	pop ds
 	mov si, 0x0000
 .loop:
-	mov dl, [si+0xA0]
-	mov [si], dl
-	add si, 0x0001
-	cmp si, 0x0FA0
+	mov dx, word [si+SCREEN_WIDTH * 2]
+	mov [si], dx
+	add si, 0x0002
+	cmp si, SCREEN_WIDTH * 2 * SCREEN_HEIGHT
 	jne .loop
 	pop ds
 	popa
@@ -153,14 +153,14 @@ char_next:
 	push bp
 	mov bp, sp
 	pusha
-	cmp word [char_x], 0x001F
+	cmp word [char_x], SCREEN_WIDTH - 1
 	jne .ifjmp1
 	cmp word [bp + 4], 0x0001;first argument
 	jne .ifjmp1
 	call char_next_line
 	jmp .end
 .ifjmp1:
-	cmp word [char_x], 0x001F
+	cmp word [char_x], SCREEN_WIDTH - 1
 	je .end
 	add word [char_x], 0x0001
 .end:
@@ -173,11 +173,11 @@ char_next_line:
 	mov [char_x], ax
 	pop ax
 	add word [char_y], 0x0001
-	cmp word [char_y], 0x000C
+	cmp word [char_y], SCREEN_HEIGHT
 	je char_btm_screen
 	ret
 char_btm_screen:
-	mov word [char_y], 0x000B
+	mov word [char_y], SCREEN_HEIGHT - 1
 	call scroll_up
 	ret
 
@@ -202,8 +202,8 @@ clear_screen:
 
 ;-----	Fill Memory	-----
 ;arg1 = address to fill
-;arg2 = ammount to fill
-;arg3 = filler
+;arg2 = ammount to fill (bytes)
+;arg3 = filler (lower byte)
 fill_mem:
 	push bp
 	mov bp, sp
@@ -211,12 +211,13 @@ fill_mem:
 	mov cx, 0
 	mov di, [bp + 4]; arg1
 	mov dx, [bp + 8]; arg3
-fill_mem_loop:
-	mov [di], dx; fill current addr
+.loop:
+	mov [di], dl; fill current addr
 	add di, 1
 	add cx, 1
 	cmp cx, [bp + 6]; arg2
-	jne fill_mem_loop
+	jne .loop
+	
 	popa
 	pop bp
 	ret
@@ -224,23 +225,27 @@ fill_mem_loop:
 
 
 ;-----	Copy Memory	-----
-;i/ax = copy from
-;j/cx = copy to
-;z/bx = ammount to copy
+;arg1 = copy from
+;arg2 = copy to
+;arg3 = ammount to copy (bytes)
 copy_mem:
+	push bp
+	mov bp, sp
 	pusha
-	mov di, bx
-	mov si, ax
-copy_mem_loop:
-	mov dx, [si]
-	mov [di], dx
+	mov cx, 0
+	mov si, [bp + 4]; arg1
+	mov di, [bp + 6]; arg2
+.loop:
+	mov dl, [si]
+	mov [di], dl
 	add si, 1
+	add di, 1
 	add cx, 1
-	sub di, 1
-	cmp di, 0
-	jg copy_mem_loop
-copy_mem_end:
+	cmp cx, [bp + 8]; arg3
+	jg .loop
+	
 	popa
+	pop bp
 	ret
 
 
@@ -253,10 +258,10 @@ draw_string:
 	pusha
 	mov si, [bp + 4]; arg1
 	mov ax, 0x0000
-draw_string_loop:
+.loop:
 	mov al, [si]
 	cmp al, 0x00
-	je draw_string_end
+	je .end
 	
 	push ax
 	call draw_char
@@ -267,8 +272,8 @@ draw_string_loop:
 	add sp, 2
 	
 	add si, 0x0001
-	jmp draw_string_loop
-draw_string_end:
+	jmp .loop
+.end:
 	popa
 	pop bp
 	ret
@@ -312,22 +317,24 @@ cmp_string:
 draw_logo:
 	push ax
 	push bx
-	push dx
+	push cx
 	push word [colour_text]
 	mov ax, [logo_colour]
 	mov [colour_text], ax
 	mov bx, [char_x]
 	mov ax, logo_str1
-	mov dx, 0x0000
-draw_logo_loop:
+	mov cx, 0x0000
+.loop:
 	mov word [char_x], bx
+	push ax; draw_string arg1
 	call draw_string
-	add ax, 0x0009
-	add dx, 0x0001
+	add sp, 2
+	add ax, 0x000B
+	add cx, 0x0001
 	add word [char_y], 0x0001
-	cmp dx, 0x0004
-	jne draw_logo_loop
-draw_logo_end:
+	cmp cx, 0x0004
+	jne .loop
+.end:
 	pop word [colour_text]
 	pop dx
 	pop bx
@@ -438,6 +445,26 @@ colour_choices:
 	pop si
 	ret
 
+;-----  Set Font -----
+setup_font:
+	pusha
+	push es
+	push bp
+	
+	mov bh,16
+	mov bl,0
+	mov ax,cs
+	mov es,ax
+	mov bp,sys_font
+	mov cx,16
+	mov dx,0xC0
+	mov ax,1100h
+	int 10h
+	
+	pop bp
+	pop es
+	popa
+	ret
 
 ;-----	Floppy State	-----
 ;b = state

@@ -8,8 +8,8 @@ test:
 	mov ax,cs
 	mov es,ax
 	mov bp,sys_font
-	mov cx,256
-	mov dx,80h
+	mov cx,15
+	mov dx,0xC0
 	mov ax,1100h
 	int 10h
 	

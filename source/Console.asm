@@ -1,16 +1,12 @@
 ;-----	Console -----
 console:
-	;set sp, 0x0000
 	push ax
 	push bx
-
-	; mov ax, 0
-	; mov bx, [screen_loc]
-	; hwi [dev_screen]
 
 	; mov a, 1
 	; mov b, sys_font ;Set font
 	; hwi [dev_screen]
+	call setup_font
 
 	; set a, 2
 	; set b, sys_colour ;Set colours
@@ -40,16 +36,6 @@ console:
 	call keyboard_int_setup
 	add sp, 2
 
-
-	; mov a, 3
-	; mov b, 0xbeef	;interrupt message = 0xbeef
-	; hwi [dev_keyboard]	;Make keyboard send interupts
-
-	; ias console_int_handler	;set interrupt handler
-
-	; set a, 0
-	; hwi [dev_keyboard]	;clear keyboard buffer
-
 	pop bx
 	pop ax
 	jmp console_loop_start
@@ -57,8 +43,6 @@ console:
 console_loop_start:
 	mov cx, 0x0000
 	mov word [key_char], 0x0000
-	; ias console_int_handler
-	; iaq 0x0000
 	sti
 console_loop:
 	cmp word [key_char], 0x0000
@@ -101,7 +85,7 @@ console_bksp:
 	sub word [con_cmd_pos], 0x0001
 .ifjmp1:
 	mov bx, [con_cmd_pos]
-	mov word [con_cmd+bx], 0x0000
+	mov byte [con_cmd+bx], 0x00
 	pop bx
 	jmp console_loop_start
 
@@ -137,7 +121,7 @@ console_char:
 	call char_next
 	add sp, 2
 	
-	cmp word [char_x], 0x001F
+	cmp word [char_x], SCREEN_WIDTH - 1
 	jne .ifjmp1
 	mov word [colour_cur], 0x8C00; set cursor red
 .ifjmp1:
@@ -158,7 +142,7 @@ console_cmd_inp:
 	push cx
 	mov cx, [key_char]
 	mov bx, [con_cmd_pos]
-	mov word [con_cmd+bx], cx
+	mov byte [con_cmd+bx], cl
 	add word [con_cmd_pos], 0x0001
 	pop cx
 	pop bx
@@ -198,7 +182,7 @@ console_cmd_read_match:
 	jmp [cmd_list_addr+si]
 
 console_clear_cmd:
-	push 0
+	push 0x0000
 	push word [con_cmd_len]
 	push con_cmd; fill_mem arg1
 	call fill_mem
@@ -219,12 +203,12 @@ end_secret_loop:
 	jne .ifjmp1
 	add bx, 0x0001
 .ifjmp1:
-	cmp bx, 0x0004
+	cmp bx, 0xffff
 	jne .ifjmp2
 	push secret
 	call draw_string
 	add sp, 2
 .ifjmp2:
-	cmp bx, 0x0004
+	cmp bx, 0xffff
 	je end
 	jmp end_secret_loop

@@ -107,6 +107,7 @@ bordcolour:
 	jmp console_new_cmd
 
 about:
+	push ax
 	push word [char_x_start]
 	push word [colour_text]
 	mov word [char_x_start], 0x0000
@@ -122,10 +123,12 @@ about:
 	call char_next_line
 	push about4
 	call draw_string
-	mov word [colour_text], 0x0100
+	mov ax, [about4_2_colour]
+	mov word [colour_text], ax
 	push about4_2
 	call draw_string
 	add sp, 10
 	pop word [colour_text]
 	pop word [char_x_start]
+	pop ax
 	jmp console_new_cmd
