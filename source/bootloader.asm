@@ -11,6 +11,7 @@
 
 
 	BITS 16
+	org 0x7c00
 
 	jmp short bootloader_start	; Jump past disk description section
 	nop				; Pad out before disk description
@@ -53,8 +54,8 @@ bootloader_start:
 	mov sp, 4096
 	sti				; Restore interrupts
 
-	mov ax, 07C0h			; Set data segment to where we're loaded
-	mov ds, ax
+	;mov ax, 07C0h			; Set data segment to where we're loaded
+	;mov ds, ax
 
 	; NOTE: A few early BIOSes are reported to improperly set DL
 
@@ -122,7 +123,7 @@ search_dir:
 next_root_entry:
 	xchg cx, dx			; We use CX in the inner loop...
 
-	mov si, kern_filename		; Start searching for kernel filename
+	mov si, boot_filename		; Start searching for kernel filename
 	mov cx, 11
 	rep cmpsb
 	je found_file_to_load		; Pointer DI will be at offset 11
@@ -135,7 +136,7 @@ next_root_entry:
 	xchg dx, cx			; Get the original CX back
 	loop next_root_entry
 
-	mov si, file_not_found		; If kernel is not found, bail out
+	mov si, boot_not_found		; If kernel is not found, bail out
 	call print_string
 	jmp reboot
 
@@ -178,7 +179,7 @@ fatal_disk_error:
 read_fat_ok:
 	popa
 
-	mov ax, 2000h			; Segment where we'll load the kernel
+	mov ax, 0800h			; Segment where we'll load the kernel
 	mov es, ax
 	mov bx, 0
 
@@ -200,7 +201,7 @@ load_file_sector:
 
 	call l2hts			; Make appropriate params for int 13h
 
-	mov ax, 2000h			; Set buffer past what we've already read
+	mov ax, 0800h			; Set buffer past what we've already read
 	mov es, ax
 	mov bx, word [pointer]
 
@@ -259,8 +260,11 @@ next_cluster_cont:
 end:					; We've got the file to load!
 	pop ax				; Clean up the stack (AX was pushed earlier)
 	mov dl, byte [bootdev]		; Provide kernel with boot device info
+	mov ax, [RootDirEntries]
+	mov bx, [SectorsPerTrack]
+	mov cx, [Sides]
 
-	jmp 2000h:0000h			; Jump to entry point of loaded kernel!
+	jmp 0000h:8000h			; Jump to entry point of loaded kernel!
 
 
 ; ------------------------------------------------------------------
@@ -333,10 +337,10 @@ l2hts:			; Calculate head, track and sector settings for int 13h
 ; ------------------------------------------------------------------
 ; STRINGS AND VARIABLES
 
-	kern_filename	db "KERNEL  BIN"	; MikeOS kernel filename
+	boot_filename	db "BOOT    BIN"	; MikeOS kernel filename
 
-	disk_error	db "Floppy error! Press any key...", 0
-	file_not_found	db "KERNEL.BIN not found!", 0
+	disk_error	db "Floppy error! Press any key.", 0
+	boot_not_found	db "BOOT.BIN not found!", 0
 
 	bootdev		db 0 	; Boot device number
 	cluster		dw 0 	; Cluster of the file we want to load

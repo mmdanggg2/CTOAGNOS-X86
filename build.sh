@@ -1,14 +1,11 @@
 #!/bin/sh
-DISK_IMG=disk_images/ctoagnos.img
+DISK_IMG=disk_images/test.img
 
-# This script assembles the MikeOS bootloader, kernel and programs
-# with NASM, and then creates floppy and CD images (on Linux)
+# This script assembles the CTOAGNOS bootloader, kernel and programs
+# with NASM & GCC, and then creates floppy and CD images (on Linux)
 
 # Only the root user can mount the floppy disk image as a virtual
 # drive (loopback mounting), in order to copy across the files
-
-# (If you need to blank the floppy image: 'mkdosfs disk_images/mikeos.flp')
-
 
 if test "`whoami`" != "root" ; then
 	echo "You must be logged in as root to build (for loopback mounting)"
@@ -32,43 +29,37 @@ echo ">>> Assembling bootloader..."
 
 nasm -O0 -w+orphan-labels -f bin -o bin/bootloader.bin source/bootloader.asm || exit
 
-
-echo ">>> Assembling MikeOS kernel..."
+echo ">>> Assembling bootstrapper..."
 
 cd source
-nasm -O0 -w+orphan-labels -f bin -o ../bin/kernel.bin kernel.asm || exit
 
-echo ">>> Assembling programs..."
+nasm -O0 -w+orphan-labels -f bin -o ../bin/boot.bin boot.asm || exit
 
-# cd programs
 
-# for i in *.asm
-# do
-	# nasm -O0 -w+orphan-labels -f bin $i -o ../../bin/programs/$(basename $i .asm).bin || exit
-# done
+echo ">>> Compiling kernel..."
 
-# cd ..
+#gcc -O0 -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -S kernel.s test.cpp test2.cpp || exit
+#gcc -O0 -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -c kernel.s test.cpp test2.cpp || exit
+
+gcc -O0 -g -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -Wl,--nmagic,--script=../linker.ld -o ../bin/kernel.bin kernel.s test.cpp test2.cpp || exit
+
 cd ..
+
+echo ">>> Compile done!"
+
 
 echo ">>> Adding bootloader to floppy image..."
 
 dd status=noxfer conv=notrunc if=bin/bootloader.bin of=$DISK_IMG || exit
 
 
-echo ">>> Copying MikeOS kernel and programs..."
+echo ">>> Copying kernel and programs..."
 
 rm -rf tmp-loop
 
 mcopy -i $DISK_IMG bin/kernel.bin ::kernel.bin
-
-# cd bin/programs
-# for i in *.bin
-# do
-	# mcopy -i ../../$DISK_IMG $i ::$i
-# done
-# cd ../..
+mcopy -i $DISK_IMG bin/boot.bin ::boot.bin
 
 sleep 0.2
 
 echo '>>> Done!'
-

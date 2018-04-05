@@ -1,60 +1,121 @@
-; ==================================================================
-; The Mike Operating System bootloader
-; Copyright (C) 2006 - 2014 MikeOS Developers -- see doc/LICENSE.TXT
+org 0x8000
+bits 16
+boot:
+mov byte [bootdev], dl
+mov [RootDirEntries], ax
+mov [SectorsPerTrack], bx
+mov [Sides], cx
+call bootloader_start; load kernel to 0x20000
+
+
+mov ax, 0
+mov bx, 0
+mov dx, 0
+mov ah, 2
+mov bh, 0
+mov dh, -1
+mov dl, 0
+int 0x10;remove cursor
+
+
+xor ax, ax       ; make it zero
+mov ss, ax             ; stack starts at seg 0
+mov sp, 0x9c00         ; 2000h past code start, 
+					  ; making the stack 7.5k in size
+
+cli                    ; no interrupts
+
+lgdt [gdtinfo]         ; load gdt register
+mov  eax, cr0          ; switch to pmode by
+or al,1                ; set pmode bit
+mov  cr0, eax
+
+jmp dword 0x08:protectedStart
+
+gdt:         
+dd 0,0        ; entry 0 is always unused
+;	entry 1, code
+;	  limit , base
+dw 0xffff, 0
 ;
-; Based on a free boot loader by E Dehling. It scans the FAT12
-; floppy for KERNEL.BIN (the MikeOS kernel), loads it and executes it.
-; This must grow no larger than 512 bytes (one sector), with the final
-; two bytes being the boot signature (AA55h). Note that in FAT12,
-; a cluster is the same as a sector: 512 bytes.
-; ==================================================================
+db  0, 0x9A, 0b11001111, 0
+;	entry 2, data
+db 0xff, 0xff, 0, 0, 0, 0x92, 0b11001111, 0
+gdt_end:
+
+gdtinfo:
+dw gdt_end - gdt - 1		;last byte in table
+dd gdt					;start of table
 
 
-	BITS 16
+bits 32
+protectedStart:
+mov bx, 0x10          ; select descriptor 2
+mov ds, bx            ; 10h = 0100b
+mov es, bx
+mov fs, bx
+mov gs, bx
+mov ss, bx
+mov esp, 0x15000
 
-	jmp short bootloader_start	; Jump past disk description section
-	nop				; Pad out before disk description
+sti
 
+mov bx, 0x0f01         ; attrib/char of smiley
+mov eax, 0x0b8000      ; note 32 bit offset
+mov WORD [eax], bx
+
+
+mov eax, 0xB8008
+mov DWORD [eax], 0x0769
+
+nop
+nop
+jmp 0x20000		;jump to kernel
+nop
+nop
+
+
+bits 16
 
 ; ------------------------------------------------------------------
 ; Disk description table, to make it a valid floppy
 ; Note: some of these values are hard-coded in the source!
 ; Values are those used by IBM for 1.44 MB, 3.5" diskette
 
-OEMLabel		db "CTOAGNOS"	; Disk label
-BytesPerSector		dw 512		; Bytes per sector
-SectorsPerCluster	db 1		; Sectors per cluster
-ReservedForBoot		dw 1		; Reserved sectors for boot record
-NumberOfFats		db 2		; Number of copies of the FAT
+; OEMLabel		db "CTOAGNOS"	; Disk label
+; BytesPerSector		dw 512		; Bytes per sector
+; SectorsPerCluster	db 1		; Sectors per cluster
+; ReservedForBoot		dw 1		; Reserved sectors for boot record
+; NumberOfFats		db 2		; Number of copies of the FAT
 RootDirEntries		dw 224		; Number of entries in root dir
-					; (224 * 32 = 7168 = 14 sectors to read)
-LogicalSectors		dw 2880		; Number of logical sectors
-MediumByte		db 0F0h		; Medium descriptor byte
-SectorsPerFat		dw 9		; Sectors per FAT
+					; ; (224 * 32 = 7168 = 14 sectors to read)
+; LogicalSectors		dw 2880		; Number of logical sectors
+; MediumByte		db 0F0h		; Medium descriptor byte
+; SectorsPerFat		dw 9		; Sectors per FAT
 SectorsPerTrack		dw 18		; Sectors per track (36/cylinder)
 Sides			dw 2		; Number of sides/heads
-HiddenSectors		dd 0		; Number of hidden sectors
-LargeSectors		dd 0		; Number of LBA sectors
-DriveNo			dw 0		; Drive No: 0
-Signature		db 41		; Drive signature: 41 for floppy
-VolumeID		dd 00000000h	; Volume ID: any number
-VolumeLabel		db "CTOAGN-OS  "; Volume Label: any 11 chars
-FileSystem		db "FAT12   "	; File system type: don't change!
+; HiddenSectors		dd 0		; Number of hidden sectors
+; LargeSectors		dd 0		; Number of LBA sectors
+; DriveNo			dw 0		; Drive No: 0
+; Signature		db 41		; Drive signature: 41 for floppy
+; VolumeID		dd 00000000h	; Volume ID: any number
+; VolumeLabel		db "CTOAGNOS   "; Volume Label: any 11 chars
+; FileSystem		db "FAT12   "	; File system type: don't change!
 
 
 ; ------------------------------------------------------------------
 ; Main bootloader code
 
 bootloader_start:
-	mov ax, 07C0h			; Set up 4K of stack space above buffer
-	add ax, 544			; 8k buffer = 512 paragraphs + 32 paragraphs (loader)
-	cli				; Disable interrupts while changing stack
-	mov ss, ax
-	mov sp, 4096
-	sti				; Restore interrupts
+	;mov ax, 07C0h			; Set up 4K of stack space above buffer
+	;add ax, 544			; 8k buffer = 512 paragraphs + 32 paragraphs (loader)
+	;cli				; Disable interrupts while changing stack
+	;mov ss, ax
+	;mov sp, 4096
+	;sti				; Restore interrupts
 
-	mov ax, 07C0h			; Set data segment to where we're loaded
-	mov ds, ax
+	;mov ax, 07C0h			; Set data segment to where we're loaded
+	;mov ds, ax
 
 	; NOTE: A few early BIOSes are reported to improperly set DL
 
@@ -258,9 +319,8 @@ next_cluster_cont:
 
 end:					; We've got the file to load!
 	pop ax				; Clean up the stack (AX was pushed earlier)
-	mov dl, byte [bootdev]		; Provide kernel with boot device info
 
-	jmp 2000h:0000h			; Jump to entry point of loaded kernel!
+	ret					;return back to boot
 
 
 ; ------------------------------------------------------------------
@@ -342,15 +402,4 @@ l2hts:			; Calculate head, track and sector settings for int 13h
 	cluster		dw 0 	; Cluster of the file we want to load
 	pointer		dw 0 	; Pointer into Buffer, for loading kernel
 
-
-; ------------------------------------------------------------------
-; END OF BOOT SECTOR AND BUFFER START
-
-	times 510-($-$$) db 0	; Pad remainder of boot sector with zeros
-	dw 0AA55h		; Boot signature (DO NOT CHANGE!)
-
-
-buffer:				; Disk buffer begins (8k after this, stack starts)
-
-
-; ==================================================================
+buffer:
