@@ -60,14 +60,6 @@ mov esp, 0x15000
 
 sti
 
-mov bx, 0x0f01         ; attrib/char of smiley
-mov eax, 0x0b8000      ; note 32 bit offset
-mov WORD [eax], bx
-
-
-mov eax, 0xB8008
-mov DWORD [eax], 0x0769
-
 nop
 nop
 jmp 0x20000		;jump to kernel

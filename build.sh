@@ -1,5 +1,5 @@
 #!/bin/sh
-DISK_IMG=disk_images/test.img
+DISK_IMG=disk_images/ctoagnos.img
 
 # This script assembles the CTOAGNOS bootloader, kernel and programs
 # with NASM & GCC, and then creates floppy and CD images (on Linux)
@@ -38,12 +38,10 @@ nasm -O0 -w+orphan-labels -f bin -o ../bin/boot.bin boot.asm || exit
 
 echo ">>> Compiling kernel..."
 
-#gcc -O0 -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -S kernel.s test.cpp test2.cpp || exit
-#gcc -O0 -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -c kernel.s test.cpp test2.cpp || exit
-
-gcc -O0 -g -m32 -masm=intel -march=i386 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -Wl,--nmagic,--script=../linker.ld -o ../bin/kernel.bin kernel.s test.cpp test2.cpp || exit
+gcc -O0 -g -m32 -masm=intel -march=i386 -std=c++11 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -Wl,--nmagic,--script=../linker.ld -o ../bin/kernel.o -I. kernel.s kernel.cpp video/*.cpp utils/*.cpp || exit
 
 cd ..
+objcopy -O binary bin/kernel.o bin/kernel.bin
 
 echo ">>> Compile done!"
 

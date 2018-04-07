@@ -1,4 +1,4 @@
-OUTPUT_FORMAT(binary)
+/*OUTPUT_FORMAT(binary)*/
 ENTRY(start)
 PHYS_BASE = 0X20000;
 SECTIONS
@@ -17,8 +17,8 @@ SECTIONS
 	}
 	_heap = ALIGN(4);
 
-	/DISCARD/ : {
+	/*/DISCARD/ : {
 		*(.note.gnu.build-id);
 		*(.comment);
-	}
+	}*/
 }
