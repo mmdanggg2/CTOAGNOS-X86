@@ -29,10 +29,12 @@
   <ItemGroup>
     <ClCompile Include="source\kernel.cpp" />
     <ClCompile Include="source\utils\memory.cpp" />
+    <ClCompile Include="source\utils\string.cpp" />
     <ClCompile Include="source\video\TextMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\utils\memory.h" />
+    <ClInclude Include="source\utils\string.h" />
     <ClInclude Include="source\video\TextMode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
