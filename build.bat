@@ -1,0 +1,1 @@
+C:\windows\sysnative\wsl.exe sudo ./build.sh
