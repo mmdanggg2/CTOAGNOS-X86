@@ -17,8 +17,8 @@ SECTIONS
 	}
 	_heap = ALIGN(4);
 
-	/*/DISCARD/ : {
+	/DISCARD/ : {
 		*(.note.gnu.build-id);
 		*(.comment);
-	}*/
+	}
 }

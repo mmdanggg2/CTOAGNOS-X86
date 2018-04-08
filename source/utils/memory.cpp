@@ -12,6 +12,5 @@ namespace mem {
 		for (int i = 0; i < size; i++) {
 			((char*)dst)[i] = ((char*)src)[i];
 		}
-
 	}
 }
