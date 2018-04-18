@@ -29,12 +29,15 @@
   <ItemGroup>
     <ClCompile Include="source\system\InterruptTable.cpp" />
     <ClCompile Include="source\kernel.cpp" />
+    <ClCompile Include="source\utils\asmWraps.cpp" />
     <ClCompile Include="source\utils\memory.cpp" />
     <ClCompile Include="source\utils\string.cpp" />
     <ClCompile Include="source\video\TextMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\system\InterruptTable.h" />
+    <ClInclude Include="source\utils\asmWraps.h" />
+    <ClInclude Include="source\IntellisenseIncl.h" />
     <ClInclude Include="source\utils\memory.h" />
     <ClInclude Include="source\utils\string.h" />
     <ClInclude Include="source\video\TextMode.h" />
@@ -82,6 +85,7 @@
     <NMakeIncludeSearchPath>$(ProjectDir)source;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
     <IntDir>build\$(Configuration)</IntDir>
+    <NMakeForcedIncludes>IntellisenseIncl.h</NMakeForcedIncludes>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>

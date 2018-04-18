@@ -18,8 +18,12 @@ static_assert((sizeof(IDTDescr) == 8), "Bad IDTDescr size!");
 
 class InterruptTable
 {
-	void* tableAddr;
+	IDTDescr* tableAddr;
 public:
+	void set(uint8_t intNum, IDTDescr descriptor);
+
+	void setIDTReg();
+
 	InterruptTable(void* tableAddr);
 	~InterruptTable();
 };
