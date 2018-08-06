@@ -4,12 +4,12 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>"C:\Program Files (x86)\qemu\qemu-system-i386.exe"</LocalDebuggerCommand>
+    <LocalDebuggerCommand>C:\Program Files\qemu\qemu-system-i386.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-monitor stdio -d guest_errors,pcall -s -S -drive format=raw,file="$(TargetPath)",index=0,if=floppy</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>"C:\Program Files (x86)\qemu\qemu-system-i386.exe"</LocalDebuggerCommand>
+    <LocalDebuggerCommand>C:\Program Files\qemu\qemu-system-i386.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-monitor stdio -d guest_errors,pcall -s -drive format=raw,file="$(TargetPath)",index=0,if=floppy</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
