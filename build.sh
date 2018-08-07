@@ -38,7 +38,7 @@ nasm -O0 -w+orphan-labels -f bin -o ../bin/boot.bin boot.asm || exit
 
 echo ">>> Compiling kernel..."
 
-gcc -O0 -g -m32 -masm=intel -march=i386 -std=c++11 -nostdlib -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -Wl,--nmagic,--build-id=none,--script=../linker.ld -o ../bin/kernel.o -I. kernel.s kernel.cpp */*.cpp || exit
+gcc -O0 -g -m32 -masm=intel -march=i386 -std=c++11 -nostdlib -fno-builtin -ffreestanding -mgeneral-regs-only -fno-exceptions -fno-rtti -Wl,--nmagic,--build-id=none,--script=../linker.ld -o ../bin/kernel.o -I. kernel.s kernel.cpp */*.cpp || exit
 
 cd ..
 objcopy -O binary bin/kernel.o bin/kernel.bin

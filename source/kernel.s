@@ -3,6 +3,7 @@
 .globl start
 start:
 	cli #disable interrupts until table is setup...
+	call kernel_init
 	call kernel_main
 	lea esi, retCStr
 	mov edi, 0xB8000 + ((24 * 80) + 0) * 2# end line offset

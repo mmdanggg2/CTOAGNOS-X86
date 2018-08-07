@@ -27,6 +27,7 @@
     <None Include="source\us_keymap.asm" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\system\interrupts.cpp" />
     <ClCompile Include="source\system\InterruptTable.cpp" />
     <ClCompile Include="source\kernel.cpp" />
     <ClCompile Include="source\utils\asmWraps.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="source\video\TextMode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\system\interrupts.h" />
     <ClInclude Include="source\system\InterruptTable.h" />
     <ClInclude Include="source\utils\asmWraps.h" />
     <ClInclude Include="source\IntellisenseIncl.h" />
@@ -77,6 +79,7 @@
     <NMakeIncludeSearchPath>$(ProjectDir)source;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
     <IntDir>build\$(Configuration)</IntDir>
+    <NMakeForcedIncludes>IntellisenseIncl.h</NMakeForcedIncludes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>build.bat</NMakeBuildCommandLine>
