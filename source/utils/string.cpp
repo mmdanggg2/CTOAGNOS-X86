@@ -29,3 +29,7 @@ void toHex(unsigned char* in, unsigned int insz, char* out, unsigned int outsz) 
 void toHex(int in, char* out, unsigned int outsz) {
 	toHex((unsigned char*)&in, sizeof(int), out, outsz);
 }
+
+void toHex(unsigned char in, char* out, unsigned int outsz) {
+	toHex((unsigned char*)&in, sizeof(unsigned char), out, outsz);
+}

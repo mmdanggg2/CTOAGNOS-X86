@@ -40,8 +40,3 @@ InterruptTable::InterruptTable(void* tableAddr) : tableAddr((IDTDescr*)tableAddr
 	mem::fill(tableAddr, 256 * 8, 0x00);
 }
 
-
-InterruptTable::~InterruptTable()
-{
-}
-

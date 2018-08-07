@@ -12,6 +12,8 @@ public:
 
 	IDTDescr(uint32_t offset, uint16_t selector, uint8_t type, uint8_t attr);
 
+	IDTDescr(void (*offset)(struct isframe*)) : IDTDescr((uint32_t)offset, 0x8, 0xE, 0x8) {};
+
 };
 
 static_assert((sizeof(IDTDescr) == 8), "Bad IDTDescr size!");
@@ -22,9 +24,9 @@ class InterruptTable
 public:
 	void set(uint8_t intNum, IDTDescr descriptor);
 
+	// Sets up the IDT register to the constructed table.
 	void setIDTReg();
 
 	InterruptTable(void* tableAddr);
-	~InterruptTable();
 };
 

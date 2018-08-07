@@ -3,25 +3,30 @@
 #include "utils/asmWraps.h"
 #include "system/InterruptTable.h"
 #include "system/interrupts.h"
+#include "system/PIC.h"
 
-//InterruptTable idt((void*)0x500);
 TextMode video;
 
 extern "C" void kernel_init() {
 	video = TextMode();
 	video.clearScreen();
 
+	PIC::remap(0x20, 0x28);
+	PIC::setMask1(0xFD);
+
 	InterruptTable idt = InterruptTable((void*)0x500);
 	for (uint8_t i = 0; i < 0xFF; i++) {
-		idt.set(i, IDTDescr((uint32_t)&iHandlerStub, 0x8, 0xE, 0x8));
+		idt.set(i, IDTDescr(&iHandlerStub));
 	}
-	idt.set(0x0, IDTDescr((uint32_t)&iHandlerDiv0, 0x8, 0xE, 0x8));
-	idt.set(0x3, IDTDescr((uint32_t)&iHandlerBreakpoint, 0x8, 0xE, 0x8));
-	idt.set(0x6, IDTDescr((uint32_t)&iHandlerInvalidOpcode, 0x8, 0xE, 0x8));
-	idt.set(0x8, IDTDescr((uint32_t)&iHandlerDoubleFault, 0x8, 0xE, 0x8));
-	idt.set(0xC, IDTDescr((uint32_t)&iHandlerStackFault, 0x8, 0xE, 0x8));
-	idt.set(0xD, IDTDescr((uint32_t)&iHandlerGeneralProtection, 0x8, 0xE, 0x8));
-	idt.set(0xE, IDTDescr((uint32_t)&iHandlerPageFault, 0x8, 0xE, 0x8));
+	idt.set(0x00, IDTDescr(&iHandlerDiv0));
+	idt.set(0x03, IDTDescr(&iHandlerBreakpoint));
+	idt.set(0x06, IDTDescr(&iHandlerInvalidOpcode));
+	idt.set(0x08, IDTDescr(&iHandlerDoubleFault));
+	idt.set(0x0C, IDTDescr(&iHandlerStackFault));
+	idt.set(0x0D, IDTDescr(&iHandlerGeneralProtection));
+	idt.set(0x0E, IDTDescr(&iHandlerPageFault));
+	idt.set(0x20, IDTDescr(&iHandlerPITTimer));
+	idt.set(0x21, IDTDescr(&iHandlerKeyboard));
 	idt.setIDTReg();
 
 	enableInterrupts();
@@ -37,15 +42,11 @@ extern "C" int kernel_main() {
 	bool run = true;
 
 	uint32_t x = 0;
-	char out[] = { 'a', 'a', '\0'};
+	char out[] = "0";
 	while (run) {
-		if (x++ == 0u) {
-			out[0] += 0x1u;
-			video.drawString(0, 1, out);
-		}
-		if (x > 0x2FFFFFFu) {
-			x = 0;
-		}
+		out[0] += 0x1u;
+		video.drawString(79, 0, out, DisplayColor(0x1F));
+		halt();
 		//if (line > 32) {
 		//	run = false;
 		//}

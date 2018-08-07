@@ -2,6 +2,8 @@
 #include "video/TextMode.h"
 #include "utils/string.h"
 #include "utils/memory.h"
+#include "system/PIC.h"
+#include "utils/asmWraps.h"
 
 struct isframe { //interrupt stack frame
 	int errCode;
@@ -47,44 +49,62 @@ void iHandlerStub(struct isframe *frame) {
 
 __attribute__((interrupt))
 void iHandlerDiv0(struct isframe *frame) {
-	video.drawString(0, line++, "int 0x0: Division by 0!");
+	video.drawString(0, line++, "int 0x00: Division by 0!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerBreakpoint(struct isframe *frame) {
-	video.drawString(0, line++, "int 0x3: Breakpoint!");
+	video.drawString(0, line++, "int 0x03: Breakpoint!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerInvalidOpcode(struct isframe *frame) {
-	video.drawString(0, line++, "int 0x6: Invalid Opcode!");
+	video.drawString(0, line++, "int 0x06: Invalid Opcode!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerDoubleFault(struct isframe *frame) {
-	video.drawString(0, line++, "int 0x8: Double Fault!");
+	video.drawString(0, line++, "int 0x08: Double Fault!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerStackFault(struct isframe *frame) {
-	video.drawString(0, line++, "int 0xC: Stack Fault!");
+	video.drawString(0, line++, "int 0x0C: Stack Fault!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerGeneralProtection(struct isframe *frame) {
-	video.drawString(0, line++, "int 0xD: General Protection Fault!");
+	video.drawString(0, line++, "int 0x0D: General Protection Fault!");
 	printFrame(frame);
 }
 
 __attribute__((interrupt))
 void iHandlerPageFault(struct isframe *frame) {
-	video.drawString(0, line++, "int 0xE: Page Fault!");
+	video.drawString(0, line++, "int 0x0E: Page Fault!");
 	printFrame(frame);
+}
+
+__attribute__((interrupt))
+void iHandlerPITTimer(struct isframe *frame) {
+	video.drawString(0, line++, "int 0x20: PIT Timer interrupt!");
+	printFrame(frame);
+	PIC::sendEOI(0x0);
+}
+
+__attribute__((interrupt))
+void iHandlerKeyboard(struct isframe *frame) {
+	video.drawString(0, line++, "int 0x21: PIC Keyboard interrupt!");
+	printFrame(frame);
+	uint8_t scan_code = inb(0x60);//Read keyboard scan code.
+	char keyMsg[] = "Key scancode = 0x??";
+	toHex(scan_code, &keyMsg[sizeof(keyMsg)-3], 2);
+	video.drawString(0, line++, keyMsg);
+	PIC::sendEOI(0x1);
 }
 
 /*

@@ -28,6 +28,7 @@
 
 void iHandlerStub(struct isframe *frame);
 
+//Intel reserved
 void iHandlerDiv0(struct isframe *frame);
 void iHandlerBreakpoint(struct isframe *frame);
 void iHandlerInvalidOpcode(struct isframe *frame);
@@ -35,3 +36,7 @@ void iHandlerDoubleFault(struct isframe *frame);
 void iHandlerStackFault(struct isframe *frame);
 void iHandlerGeneralProtection(struct isframe *frame);
 void iHandlerPageFault(struct isframe *frame);
+
+//PIC
+void iHandlerPITTimer(struct isframe *frame);
+void iHandlerKeyboard(struct isframe *frame);

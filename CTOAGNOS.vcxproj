@@ -27,10 +27,10 @@
     <None Include="source\us_keymap.asm" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\system\PIC.cpp" />
     <ClCompile Include="source\system\interrupts.cpp" />
     <ClCompile Include="source\system\InterruptTable.cpp" />
     <ClCompile Include="source\kernel.cpp" />
-    <ClCompile Include="source\utils\asmWraps.cpp" />
     <ClCompile Include="source\utils\memory.cpp" />
     <ClCompile Include="source\utils\string.cpp" />
     <ClCompile Include="source\video\TextMode.cpp" />
@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="source\system\interrupts.h" />
     <ClInclude Include="source\system\InterruptTable.h" />
+    <ClInclude Include="source\system\PIC.h" />
     <ClInclude Include="source\utils\asmWraps.h" />
     <ClInclude Include="source\IntellisenseIncl.h" />
     <ClInclude Include="source\utils\memory.h" />
