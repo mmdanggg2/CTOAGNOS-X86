@@ -27,6 +27,7 @@
     <None Include="source\us_keymap.asm" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\input\Keyboard.cpp" />
     <ClCompile Include="source\system\PIC.cpp" />
     <ClCompile Include="source\system\interrupts.cpp" />
     <ClCompile Include="source\system\InterruptTable.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="source\video\TextMode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\input\Keyboard.h" />
     <ClInclude Include="source\system\interrupts.h" />
     <ClInclude Include="source\system\InterruptTable.h" />
     <ClInclude Include="source\system\PIC.h" />
