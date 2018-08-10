@@ -4,6 +4,7 @@
 #include "utils/memory.h"
 #include "system/PIC.h"
 #include "utils/asmWraps.h"
+#include "input/Keyboard.h"
 
 struct isframe { //interrupt stack frame
 	int errCode;
@@ -98,12 +99,12 @@ void iHandlerPITTimer(struct isframe *frame) {
 
 __attribute__((interrupt))
 void iHandlerKeyboard(struct isframe *frame) {
-	video.drawString(0, line++, "int 0x21: PIC Keyboard interrupt!");
-	printFrame(frame);
 	uint8_t scan_code = inb(0x60);//Read keyboard scan code.
-	char keyMsg[] = "Key scancode = 0x??";
-	toHex(scan_code, &keyMsg[sizeof(keyMsg)-3], 2);
-	video.drawString(0, line++, keyMsg);
+	if (!(scan_code & 0b10000000)) {// Ignore codes with high bit (release)
+		char keyMsg[] = "Key: ?";
+		keyMsg[sizeof(keyMsg) - 2] = Keyboard::translateScanCode(scan_code);
+		video.drawString(0, line, keyMsg);
+	}
 	PIC::sendEOI(0x1);
 }
 

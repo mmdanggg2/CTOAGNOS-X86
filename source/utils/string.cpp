@@ -1,5 +1,10 @@
 #include "string.h"
 
+String::String(unsigned char * base)
+{
+	str = base;
+}
+
 int String::getLength()
 {
 	int len = 0;
@@ -7,6 +12,20 @@ int String::getLength()
 		len++;
 	}
 	return len;
+}
+
+bool String::operator==(const String & str2)
+{
+	bool ret = true;
+	int i = 0;
+	while (str[i] || str2[i]) {
+		if (str[i] != str2[i]) {
+			ret = false;
+			break;
+		}
+		i++;
+	}
+	return ret;
 }
 
 void toHex(unsigned char* in, unsigned int insz, char* out, unsigned int outsz) {

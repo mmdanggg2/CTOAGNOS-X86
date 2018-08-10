@@ -1,9 +1,14 @@
 #pragma once
 
 class String {
-	char* str;
+	unsigned char* str;
+
 public:
+	String(unsigned char* base);
 	int getLength();
+	bool operator==(const String& str);
+	inline const unsigned char operator[](int i) const { return str[i]; }
+	inline unsigned char operator[](int i) { return str[i]; }
 };
 
 void toHex(unsigned char* in, unsigned int insz, char* out, unsigned int outsz);
