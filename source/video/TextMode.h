@@ -47,6 +47,8 @@ public:
 	void drawChar(int8_t x, int8_t y, DisplayCharacter character);
 	void drawString(int8_t x, int8_t y, const char* str, DisplayColor color = 0x7, bool wrap = true);
 	void clearScreen();
+
+	void scrollUp();
 };
 
 extern TextMode video;

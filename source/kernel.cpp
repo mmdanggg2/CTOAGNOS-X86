@@ -4,6 +4,7 @@
 #include "system/InterruptTable.h"
 #include "system/interrupts.h"
 #include "system/PIC.h"
+#include "system/Console.h"
 
 TextMode video;
 
@@ -19,6 +20,7 @@ extern "C" void kernel_init() {
 		idt.set(i, IDTDescr(&iHandlerStub));
 	}
 	idt.set(0x00, IDTDescr(&iHandlerDiv0));
+	idt.set(0x02, IDTDescr(&iHandlerNMI));
 	idt.set(0x03, IDTDescr(&iHandlerBreakpoint));
 	idt.set(0x06, IDTDescr(&iHandlerInvalidOpcode));
 	idt.set(0x08, IDTDescr(&iHandlerDoubleFault));
@@ -39,18 +41,8 @@ extern "C" int kernel_main() {
 	//mem::copy((void*)0xB8000, (void*)0x07c00, 80 * 25 * 2);
 	//video.drawString(4, 5, "Yo boi! this is a super duper extra really long string thats getting typed! Also with wrapping!", 0x07);
 	//video.drawString(0, 10, "Yo boi! this is a super duper extra really long string thats getting typed! Also without wrapping!", 0x07, false);
-	bool run = true;
-
-	uint32_t x = 0;
-	char out[] = "0";
-	while (run) {
-		out[0] += 0x1u;
-		video.drawString(79, 0, out, DisplayColor(0x1F));
-		halt();
-		//if (line > 32) {
-		//	run = false;
-		//}
-	}
+	
+	ret = Console().run();
 
 	return ret;
 }

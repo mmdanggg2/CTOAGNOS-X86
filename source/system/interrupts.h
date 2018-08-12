@@ -30,6 +30,7 @@ void iHandlerStub(struct isframe *frame);
 
 //Intel reserved
 void iHandlerDiv0(struct isframe *frame);
+void iHandlerNMI(struct isframe *frame);
 void iHandlerBreakpoint(struct isframe *frame);
 void iHandlerInvalidOpcode(struct isframe *frame);
 void iHandlerDoubleFault(struct isframe *frame);

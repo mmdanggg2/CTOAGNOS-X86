@@ -12,5 +12,7 @@
     <LocalDebuggerCommand>C:\Program Files\qemu\qemu-system-i386.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-monitor stdio -d guest_errors,pcall -s -drive format=raw,file="$(TargetPath)",index=0,if=floppy</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerEnvironment>
+    </LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

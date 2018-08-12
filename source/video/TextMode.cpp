@@ -10,7 +10,7 @@ TextMode::TextMode() :
 }
 
 void TextMode::drawChar(int8_t x, int8_t y, DisplayCharacter character) {
-	((int16_t*)screenLoc)[(y * 80) + x] = character;
+	((int16_t*)screenLoc)[(y * cols) + x] = character;
 }
 
 void TextMode::drawString(int8_t x, int8_t y, const char * str, DisplayColor color, bool wrap) {
@@ -35,4 +35,19 @@ void TextMode::drawString(int8_t x, int8_t y, const char * str, DisplayColor col
 
 void TextMode::clearScreen() {
 	mem::fill(screenLoc, (cols * rows) * 2, 0);
+}
+
+void TextMode::scrollUp() {
+	uint16_t* src = (uint16_t*)screenLoc + cols;
+	uint16_t* dst = (uint16_t*)screenLoc;
+	for (int y = 0; y < rows; y++) {
+		for (int x = 0; x < cols; x++) {
+			if (x == rows - 1) {
+				dst[x*y] = 0x0000;
+			}
+			else {
+				dst[x*y] = src[x*y];
+			}
+		}
+	}
 }
