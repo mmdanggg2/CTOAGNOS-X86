@@ -19,6 +19,12 @@ void handleChar(uint8_t chr) {
 	video.drawChar(chr);
 	advanceCur();
 	video.drawCur();
+	if (video.curX >= video.getCols() - 1) {
+		DisplayColor preCol = video.cursorCol;
+		video.cursorCol = DisplayColor(0xC).setBlink();
+		video.drawCur();
+		video.cursorCol = preCol;
+	}
 }
 
 int Console::run() {

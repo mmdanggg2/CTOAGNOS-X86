@@ -11,7 +11,7 @@ public:
 	//Sets the background color, truncates to 4 bits
 	void setBack(uint8_t value) { backCol = value & 0x0F; };
 	//Sets the blink bit on foreground color
-	DisplayColor& setBlink(bool blink) {
+	DisplayColor& setBlink(bool blink = true) {
 		if (blink)
 			backCol |= 0b1000;
 		else
@@ -47,6 +47,9 @@ public:
 	int curX = 0;
 	int curY = 0;
 	DisplayColor cursorCol = DisplayColor(0x7).setBlink(true);
+
+	inline int getCols() { return cols; }
+	inline int getRows() { return rows; }
 
 	TextMode();
 	// Draw a character at the x and y position.
