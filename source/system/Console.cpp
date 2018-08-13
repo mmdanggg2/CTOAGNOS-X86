@@ -18,6 +18,7 @@ void advanceCur() {
 void handleChar(uint8_t chr) {
 	video.drawChar(chr);
 	advanceCur();
+	video.drawCur();
 }
 
 int Console::run() {
