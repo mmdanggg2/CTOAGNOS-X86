@@ -6,14 +6,15 @@ TextMode::TextMode() :
 	cols(80),
 	rows(25)
 {
-
 }
 
-void TextMode::drawChar(int8_t x, int8_t y, DisplayCharacter character) {
+void TextMode::drawChar(int x, int y, DisplayCharacter character) {
 	((int16_t*)screenLoc)[(y * cols) + x] = character;
 }
 
-void TextMode::drawString(int8_t x, int8_t y, const char * str, DisplayColor color, bool wrap) {
+void TextMode::drawString(int* xPtr, int* yPtr, const char * str, DisplayColor color, bool wrap) {
+	int x = *xPtr;
+	int y = *yPtr;
 	bool truncated = false;
 	int i = 0;
 	while (str[i] != 0) {
@@ -31,6 +32,14 @@ void TextMode::drawString(int8_t x, int8_t y, const char * str, DisplayColor col
 		}
 		i++;
 	}
+	*xPtr = x;
+	*yPtr = y;
+}
+
+void TextMode::drawString(int x, int y, const char * str, DisplayColor color, bool wrap) {
+	int xT = x;
+	int yT = y;
+	drawString(&xT, &yT, str, color, wrap);
 }
 
 void TextMode::clearScreen() {
@@ -42,11 +51,11 @@ void TextMode::scrollUp() {
 	uint16_t* dst = (uint16_t*)screenLoc;
 	for (int y = 0; y < rows; y++) {
 		for (int x = 0; x < cols; x++) {
-			if (x == rows - 1) {
-				dst[x*y] = 0x0000;
+			if (y == rows - 1) {
+				dst[x + y * cols] = 0x0000;
 			}
 			else {
-				dst[x*y] = src[x*y];
+				dst[x + y * cols] = src[x + y * cols];
 			}
 		}
 	}

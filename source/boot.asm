@@ -17,6 +17,14 @@ mov dh, -1
 mov dl, 0
 int 0x10;remove cursor
 
+;Set colour pallete
+mov ax, 0x1010
+mov bx, 0x39
+mov ch, 0x27
+mov cl, 0x3F
+mov dh, 0x00
+int 10h
+
 
 xor ax, ax       ; make it zero
 mov ss, ax             ; stack starts at seg 0

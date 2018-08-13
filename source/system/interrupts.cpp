@@ -107,11 +107,10 @@ __attribute__((interrupt))
 void iHandlerKeyboard(struct isframe *frame) {
 	uint8_t scan_code = inb(0x60);//Read keyboard scan code.
 	if (!(scan_code & 0b10000000)) {// Ignore codes with high bit (release)
-		char keyMsg[] = "Key: ?";
 		keyboard::lastKey = keyboard::translateScanCode(scan_code);
+		/*char keyMsg[] = "Key: ?";
 		keyMsg[sizeof(keyMsg) - 2] = keyboard::lastKey;
-		video.drawString(0, line, keyMsg);
-
+		video.drawString(0, line, keyMsg);*/
 	}
 	PIC::sendEOI(0x1);
 }
