@@ -20,7 +20,7 @@ void InterruptTable::setIDTReg()
 #pragma pack(push)
 #pragma pack(1)
 	struct IDTInfo{
-		uint16_t size = (256 * 8) - 1;
+		uint16_t size = (256 * sizeof(IDTDescr)) - 1;
 		uint32_t idtStart;
 	};
 #pragma pack(pop)
@@ -37,6 +37,6 @@ void InterruptTable::setIDTReg()
 
 InterruptTable::InterruptTable(void* tableAddr) : tableAddr((IDTDescr*)tableAddr)
 {
-	mem::fill(tableAddr, 256 * 8, 0x00);
+	mem::fill(tableAddr, 256 * sizeof(IDTDescr), 0x00);
 }
 

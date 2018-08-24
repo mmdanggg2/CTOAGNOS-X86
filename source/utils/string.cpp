@@ -1,14 +1,26 @@
 #include "string.h"
+#include "utils/memory.h"
 
-String::String(unsigned char * base)
+String::String(const char * base)
 {
-	str = base;
+	int len = getLength(base);
+	str = (char*)mem::alloc(len);
+	mem::copy(str, base, len);
+}
+
+String::~String() {
+	mem::free(str);
 }
 
 int String::getLength()
 {
+	return getLength(str);
+}
+
+int String::getLength(const char* string)
+{
 	int len = 0;
-	while (str[len]) {
+	while (string[len]) {
 		len++;
 	}
 	return len;

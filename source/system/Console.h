@@ -4,7 +4,7 @@ class Console
 {
 	uint8_t keyInp = 0;
 #define CON_CMD_LEN 78
-	uint8_t cmdBuffer[CON_CMD_LEN];//TODO custom command length?
+	char cmdBuffer[CON_CMD_LEN];//TODO custom command length?
 	uint8_t cmdPos = 0;
 
 	int startX = 1;
@@ -12,11 +12,14 @@ class Console
 	void drawCmdLine();
 	void handleChar(uint8_t chr);
 	void handleBackspace();
+	void handleReturn();
+	void execCommand();
+	void clearCmd();
 public:
 	Console();
 
-	void advanceCur(bool toNextLine = false);
-	void advanceLine();
+	static void advanceCur(bool toNextLine = false);
+	static void advanceLine();
 
 	int run();
 };

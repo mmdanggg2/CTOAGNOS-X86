@@ -2,13 +2,23 @@
 #include "input/keyboard.h"
 #include "utils/asmWraps.h"
 #include "video/TextMode.h"
+#include "programs/OSCommands.h"
+#include "utils/string.h"
+#include "utils/memory.h"
 
 Console::Console()
 {
+	clearCmd();
+}
+
+void Console::clearCmd() {
+	mem::fill(cmdBuffer, sizeof(cmdBuffer), 0);
+	cmdPos = 0;
 }
 
 void Console::drawCmdLine() {
-	video.drawString(">"); video.drawCur();
+	video.drawString(">");
+	video.drawCur();
 }
 
 void Console::advanceCur(bool toNextLine) {
@@ -22,7 +32,7 @@ void Console::advanceCur(bool toNextLine) {
 }
 
 void Console::advanceLine() {
-	video.curX = startX;
+	video.curX = 0;
 	video.curY++;
 	if (video.curY >= video.getRows()) {
 		video.curY = video.getRows() - 1;
@@ -52,6 +62,7 @@ int Console::run() {
 			handleBackspace();
 			break;
 		case KB_RETURN:
+			handleReturn();
 			break;
 		case KB_DELETE:
 			break;
@@ -94,4 +105,27 @@ void Console::handleBackspace() {
 		cmdPos--;
 	}
 	cmdBuffer[cmdPos] = 0;// null the end of the command
+}
+
+void Console::handleReturn() {
+	video.drawChar(0x20);// draw blank space
+	advanceLine();
+	execCommand();
+	video.curX = 0;
+	drawCmdLine();
+}
+
+const char* cmdList[] = {"clear", "shutdown", "test", 0};
+const OSCmds::OSCmdSig cmdAddrList[] = { OSCmds::clear, OSCmds::shutdown, OSCmds::test };
+
+void Console::execCommand() {
+	if (cmdPos > 0) {
+		for (int i = 0; cmdList[i]; i++) {
+			if (String(cmdBuffer) == cmdList[i]) {
+				cmdAddrList[i]();// call command
+				break;
+			}
+		}
+	}
+	clearCmd();
 }
