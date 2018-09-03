@@ -12,7 +12,7 @@ void TextMode::drawChar(int x, int y, DisplayCharacter character) {
 	((int16_t*)screenLoc)[(y * cols) + x] = character;
 }
 
-void TextMode::drawString(int* xPtr, int* yPtr, const char * str, DisplayColor color, bool wrap) {
+void TextMode::drawString(int* xPtr, int* yPtr, const uint8_t * str, DisplayColor color, bool wrap) {
 	int x = *xPtr;
 	int y = *yPtr;
 	bool truncated = false;
@@ -36,7 +36,7 @@ void TextMode::drawString(int* xPtr, int* yPtr, const char * str, DisplayColor c
 	*yPtr = y;
 }
 
-void TextMode::drawString(int x, int y, const char * str, DisplayColor color, bool wrap) {
+void TextMode::drawString(int x, int y, const uint8_t * str, DisplayColor color, bool wrap) {
 	int xT = x;
 	int yT = y;
 	drawString(&xT, &yT, str, color, wrap);

@@ -1,0 +1,16 @@
+﻿---
+BasedOnStyle: Google
+AllowShortFunctionsOnASingleLine: Inline
+AccessModifierOffset: '-4'
+BreakStringLiterals: false
+ColumnLimit: '0'
+ConstructorInitializerIndentWidth: '4'
+ContinuationIndentWidth: '4'
+IndentWidth: '4'
+NamespaceIndentation: Inner
+SpacesBeforeTrailingComments: '1'
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Always
+
+...

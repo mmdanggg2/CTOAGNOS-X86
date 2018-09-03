@@ -4,8 +4,9 @@
 String::String(const char * base)
 {
 	int len = getLength(base);
-	str = (char*)mem::alloc(len);
+	str = (char*)mem::alloc(len + 1);
 	mem::copy(str, base, len);
+	str[len] = 0;
 }
 
 String::~String() {

@@ -25,6 +25,8 @@ mov cl, 0x3F
 mov dh, 0x00
 int 10h
 
+call setup_font
+
 
 xor ax, ax       ; make it zero
 mov ss, ax             ; stack starts at seg 0
@@ -76,6 +78,30 @@ nop
 
 
 bits 16
+
+;-----  Set Font -----
+setup_font:
+	pusha
+	push es
+	push bp
+	
+	mov bh,16
+	mov bl,0
+	mov ax,cs
+	mov es,ax
+	mov bp,sys_font
+	mov cx,16
+	mov dx,0xC0
+	mov ax,1100h
+	int 10h
+	
+	pop bp
+	pop es
+	popa
+	ret
+
+sys_font:
+%include "MFont.asm"
 
 ; ------------------------------------------------------------------
 ; Disk description table, to make it a valid floppy

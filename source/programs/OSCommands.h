@@ -1,13 +1,12 @@
 #pragma once
 #include "system/Console.h"
-namespace OSCmds
-{
+namespace OSCmds {
 
 typedef void (*OSCmdSig)();
 
 void clear();
 void test();
 void shutdown();
+void about();
 
-}
-
+} // namespace OSCmds

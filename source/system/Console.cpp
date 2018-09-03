@@ -1,13 +1,12 @@
 #include "Console.h"
 #include "input/keyboard.h"
-#include "utils/asmWraps.h"
-#include "video/TextMode.h"
 #include "programs/OSCommands.h"
-#include "utils/string.h"
+#include "utils/asmWraps.h"
 #include "utils/memory.h"
+#include "utils/string.h"
+#include "video/TextMode.h"
 
-Console::Console()
-{
+Console::Console() {
 	clearCmd();
 }
 
@@ -54,27 +53,25 @@ int Console::run() {
 		keyInp = keyboard::lastKey;
 		keyboard::lastKey = 0;
 
-		switch (keyInp)
-		{
-		case KB_ESCAPE:
-			break;
-		case KB_BACKSPACE:
-			handleBackspace();
-			break;
-		case KB_RETURN:
-			handleReturn();
-			break;
-		case KB_DELETE:
-			break;
-		case KB_INSERT:
-			break;
-		case KB_TAB:
-			break;
-		default:
-			handleChar(keyInp);
-			break;
+		switch (keyInp) {
+			case KB_ESCAPE:
+				break;
+			case KB_BACKSPACE:
+				handleBackspace();
+				break;
+			case KB_RETURN:
+				handleReturn();
+				break;
+			case KB_DELETE:
+				break;
+			case KB_INSERT:
+				break;
+			case KB_TAB:
+				break;
+			default:
+				handleChar(keyInp);
+				break;
 		}
-
 	}
 	return 8;
 }
@@ -95,20 +92,20 @@ void Console::handleChar(uint8_t chr) {
 }
 
 void Console::handleBackspace() {
-	if (video.curX <= startX) { 
+	if (video.curX <= startX) {
 		return;
 	}
-	video.drawChar(0x20);// draw blank space
+	video.drawChar(0x20); // draw blank space
 	video.curX--;
 	video.drawCur();
 	if (cmdPos > 0) {
 		cmdPos--;
 	}
-	cmdBuffer[cmdPos] = 0;// null the end of the command
+	cmdBuffer[cmdPos] = 0; // null the end of the command
 }
 
 void Console::handleReturn() {
-	video.drawChar(0x20);// draw blank space
+	video.drawChar(0x20); // draw blank space
 	advanceLine();
 	execCommand();
 	video.curX = 0;
@@ -116,13 +113,13 @@ void Console::handleReturn() {
 }
 
 const char* cmdList[] = {"clear", "shutdown", "test", 0};
-const OSCmds::OSCmdSig cmdAddrList[] = { OSCmds::clear, OSCmds::shutdown, OSCmds::test };
+const OSCmds::OSCmdSig cmdAddrList[] = {OSCmds::clear, OSCmds::shutdown, OSCmds::test};
 
 void Console::execCommand() {
 	if (cmdPos > 0) {
 		for (int i = 0; cmdList[i]; i++) {
 			if (String(cmdBuffer) == cmdList[i]) {
-				cmdAddrList[i]();// call command
+				cmdAddrList[i](); // call command
 				break;
 			}
 		}

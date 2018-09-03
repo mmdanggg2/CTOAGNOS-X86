@@ -1,10 +1,9 @@
 #pragma once
 #include <cinttypes>
-class Console
-{
+class Console {
 	uint8_t keyInp = 0;
 #define CON_CMD_LEN 78
-	char cmdBuffer[CON_CMD_LEN];//TODO custom command length?
+	char cmdBuffer[CON_CMD_LEN]; //TODO custom command length?
 	uint8_t cmdPos = 0;
 
 	int startX = 1;
@@ -15,6 +14,7 @@ class Console
 	void handleReturn();
 	void execCommand();
 	void clearCmd();
+
 public:
 	Console();
 
@@ -23,4 +23,3 @@ public:
 
 	int run();
 };
-
