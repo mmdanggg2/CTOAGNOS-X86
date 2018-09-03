@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "utils/asmWraps.h"
 
 #define RET KB_RETURN
 #define ESC KB_ESCAPE
@@ -7,8 +8,10 @@
 #define INS KB_INSERT
 #define DEL KB_DELETE
 
-
 namespace keyboard {
+
+/* clang-format off */
+
 // Quoted characters represent themselves
 // values are as follows :
 // 0	: No ASCII code assigned
@@ -40,13 +43,22 @@ uint8_t UKKeymap[8 * 16]{
 	 0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0
 };
 
+/* clang-format on */
+
 uint8_t* keymap = UKKeymap;
 
 uint8_t lastKey;
 
-uint8_t translateScanCode(uint8_t code)
-{
+uint8_t translateScanCode(uint8_t code) {
 	return keymap[code];
 }
 
+uint8_t waitForKey() {
+	enableInterrupts();
+	while (!keyboard::peekKey()) {
+		halt();
+	}
+	return readKey();
 }
+
+} // namespace keyboard

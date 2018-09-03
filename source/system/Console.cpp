@@ -45,13 +45,8 @@ int Console::run() {
 	video.curY = 1;
 	drawCmdLine();
 	while (true) {
-		enableInterrupts();
-		while (!keyboard::lastKey) {
-			halt();
-		}
+		keyInp = keyboard::waitForKey();
 		disableInterrupts();
-		keyInp = keyboard::lastKey;
-		keyboard::lastKey = 0;
 
 		switch (keyInp) {
 			case KB_ESCAPE:
@@ -112,10 +107,8 @@ void Console::handleReturn() {
 	drawCmdLine();
 }
 
-const char* cmdList[] = {"clear", "shutdown", "test", 0};
-const OSCmds::OSCmdSig cmdAddrList[] = {OSCmds::clear, OSCmds::shutdown, OSCmds::test};
-
 void Console::execCommand() {
+	using namespace OSCmds;
 	if (cmdPos > 0) {
 		for (int i = 0; cmdList[i]; i++) {
 			if (String(cmdBuffer) == cmdList[i]) {

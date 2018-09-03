@@ -3,6 +3,9 @@
 
 namespace OSCmds {
 
+const char* cmdList[] = {"clear", "shutdown", "about", "textcolor", "test", 0};
+const OSCmdSig cmdAddrList[] = {clear, shutdown, about, textColor, test};
+
 void clear() {
 	video.clearScreen();
 	video.curX = 0;
@@ -40,6 +43,19 @@ void shutdown() {
 	drawLogo();
 }
 
-void about() {}
+void about() {
+	video.drawString("CTOAGNOS Ver 0.01");
+	Console::advanceLine();
+	video.drawString("Couldn't Think Of A Good Name OS");
+	Console::advanceLine();
+	Console::advanceLine();
+	video.drawString("Created by ");
+	video.drawString("mmdanggg2 \xC0\xC1", 0x9);
+	Console::advanceLine();
+}
+
+void textColor() {
+	video.drawString("Choose the text color: ");
+}
 
 } // namespace OSCmds
