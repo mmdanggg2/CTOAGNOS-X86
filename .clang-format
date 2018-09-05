@@ -7,6 +7,7 @@ ColumnLimit: '0'
 ConstructorInitializerIndentWidth: '4'
 ContinuationIndentWidth: '4'
 IndentWidth: '4'
+MaxEmptyLinesToKeep: '2'
 NamespaceIndentation: Inner
 SpacesBeforeTrailingComments: '1'
 Standard: Cpp11

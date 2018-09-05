@@ -72,18 +72,18 @@ int Console::run() {
 }
 
 void Console::handleChar(uint8_t chr) {
-	DisplayColor preCol = video.cursorCol;
+	DisplayColor curCol = video.defaultCol;
+	curCol.setBlink();
 	video.drawChar(chr);
 	advanceCur();
 	if (video.curX >= video.getCols() - 1) {
-		video.cursorCol = DisplayColor(0xC).setBlink();
+		curCol = DisplayColor(0xC).setBlink();
 	}
 	if (cmdPos < CON_CMD_LEN) {
 		cmdBuffer[cmdPos++] = chr;
 	}
 
-	video.drawCur();
-	video.cursorCol = preCol;
+	video.drawCur(curCol);
 }
 
 void Console::handleBackspace() {
