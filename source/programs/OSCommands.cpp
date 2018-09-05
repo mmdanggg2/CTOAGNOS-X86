@@ -5,8 +5,20 @@
 
 namespace OSCmds {
 
-const char* cmdList[] = {"clear", "shutdown", "about", "textcolor", "test", 0};
-const OSCmdSig cmdAddrList[] = {clear, shutdown, about, textColor, test};
+const char* cmdList[] = {"help", "clear", "shutdown", "about", "textcolor", "test", 0};
+const OSCmdSig cmdAddrList[] = {help, clear, shutdown, about, textColor, test};
+
+void help() {
+	video.drawString("Built-in commands:");
+	Console::advanceLine();
+	for (int i = 0; cmdList[i]; i++) {
+		video.drawString(cmdList[i]);
+		if (cmdList[i + 1]) {
+			video.drawString(", ");
+		}
+	}
+	Console::advanceLine();
+}
 
 void clear() {
 	video.clearScreen();

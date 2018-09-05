@@ -4,6 +4,7 @@ namespace OSCmds {
 
 typedef void (*OSCmdSig)();
 
+void help();
 void clear();
 void test();
 void shutdown();
