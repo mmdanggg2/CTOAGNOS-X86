@@ -1,1 +1,1 @@
-C:\windows\sysnative\wsl.exe sudo ./build.sh
+C:\windows\sysnative\wsl.exe make %*

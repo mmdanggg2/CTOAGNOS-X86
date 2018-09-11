@@ -87,6 +87,8 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
     <IntDir>build\$(Configuration)</IntDir>
     <NMakeForcedIncludes>IntellisenseIncl.h</NMakeForcedIncludes>
+    <NMakeReBuildCommandLine>build.bat clean ctoagnos</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>build.bat clean</NMakeCleanCommandLine>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>build.bat</NMakeBuildCommandLine>
@@ -96,6 +98,8 @@
     <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
     <IntDir>build\$(Configuration)</IntDir>
     <NMakeForcedIncludes>IntellisenseIncl.h</NMakeForcedIncludes>
+    <NMakeReBuildCommandLine>build.bat clean ctoagnos</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>build.bat clean</NMakeCleanCommandLine>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
