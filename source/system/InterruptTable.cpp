@@ -26,12 +26,12 @@ void InterruptTable::setIDTReg()
 #pragma pack(pop)
 	static_assert(sizeof(IDTInfo) == 6, "Bad IDTInfo size!");
 
-	IDTInfo idtInf = IDTInfo();
-	idtInf.idtStart = (uint32_t)tableAddr;
+	IDTInfo idtInfo = IDTInfo();
+	idtInfo.idtStart = (uint32_t)tableAddr;
 
-	__asm__("lidt [%[info]]"
+	__asm__ ("lidt %0"
 	: /*no outs*/
-	: [info] "r"(&idtInf)
+	: "m"(idtInfo)
 	: /*no clobbered*/);
 }
 

@@ -9,7 +9,7 @@
 #define KB_DELETE 11
 
 namespace keyboard {
-extern uint8_t lastKey;
+extern volatile uint8_t lastKey;
 
 uint8_t translateScanCode(uint8_t code);
 

@@ -47,7 +47,7 @@ uint8_t UKKeymap[8 * 16]{
 
 uint8_t* keymap = UKKeymap;
 
-uint8_t lastKey;
+volatile uint8_t lastKey;
 
 uint8_t translateScanCode(uint8_t code) {
 	return keymap[code];
